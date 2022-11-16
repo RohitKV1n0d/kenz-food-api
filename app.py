@@ -1,10 +1,13 @@
 #flask boilerpalte
-from flask import Flask, request, jsonify, render_template, url_for ,redirect
+from flask import Flask, request, jsonify, render_template, url_for ,redirect, session
 #sql
 from flask_sqlalchemy import SQLAlchemy
+
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 #migration
 from flask_migrate import Migrate
 import os
+
 
 from werkzeug.utils import secure_filename
 import json
@@ -48,7 +51,7 @@ migrate = Migrate(app, db)
 
 
 
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     ip_address = db.Column(db.String(100))
@@ -68,7 +71,7 @@ class Users(db.Model):
     latitude = db.Column(db.String(100), nullable=True)
     longitude = db.Column(db.String(100), nullable=True)
 
-    prod_cat = db.relationship('ProductCategory', backref='prod_cat')
+    # prod_cat = db.relationship('ProductCategory', backref='prod_cat')
 
 
 class ProductCategory(db.Model):
@@ -82,7 +85,9 @@ class ProductCategory(db.Model):
     category_desc_ar = db.Column(db.String(100), nullable=True)
     active = db.Column(db.String(100), nullable=True)
 
-    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    cat_product = db.relationship('Products', backref='product')
+    sub_cat = db.relationship('ProductSubCategory', backref='sub_cat')
+    # fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 class ProductSubCategory(db.Model):
@@ -96,18 +101,80 @@ class ProductSubCategory(db.Model):
     subcategory_desc_ar = db.Column(db.String(100), nullable=True)
     active = db.Column(db.String(100), nullable=True)
 
-    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    sub_product = db.relationship('Products', backref='product')
     fk_prod_cat_id = db.Column(db.Integer, db.ForeignKey('productcategory.id'))
 
 
+class Products(db.Model):
+    __tablename__ = 'products'
+    id = db.Column(db.Integer, primary_key=True)
+    product_name_en = db.Column(db.String(100), nullable=False)
+    product_name_ar = db.Column(db.String(100), nullable=True)
+    product_desc_en = db.Column(db.String(100), nullable=True)
+    product_desc_ar = db.Column(db.String(100), nullable=True)
+    unit_id = db.Column(db.String(100), nullable=True)
+    unit_quantity = db.Column(db.String(100), nullable=True)
+    product_code = db.Column(db.String(100), nullable=True)
+    produc_barcode = db.Column(db.String(100), nullable=True)
+    other_title_en = db.Column(db.String(100), nullable=True)
+    other_title_ar = db.Column(db.String(100), nullable=True)
+    other_desc_en = db.Column(db.String(100), nullable=True)
+    other_desc_ar = db.Column(db.String(100), nullable=True)
+    status = db.Column(db.String(100), nullable=True)
+    fast_delivery = db.Column(db.String(100), nullable=True)
+    featured = db.Column(db.String(100), nullable=True)
+    fresh = db.Column(db.String(100), nullable=True)
+    offer = db.Column(db.String(100), nullable=True)
+
+    cat = db.Column(db.Integer, db.ForeignKey('productcategory.id'))
+    subcat = db.Column(db.Integer, db.ForeignKey('productsubcategory.id'))
+
+    product_image = db.relationship('ProductImage', backref='product_image')
+
+
+class ProductImages(db.Model):
+    __tablename__ = 'productimages'
+    id = db.Column(db.Integer, primary_key=True)
+    product_image_url = db.Column(db.String(100), nullable=True)
+    product_image_desc_en = db.Column(db.String(100), nullable=True)
+    product_image_desc_ar = db.Column(db.String(100), nullable=True)
+
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+
+class product_stock(db.Model):
+    __tablename__ = 'productstock'
+    id = db.Column(db.Integer, primary_key=True)
+    product_price = db.Column(db.String(100), nullable=True)
+    product_offer_price = db.Column(db.String(100), nullable=True)
+    product_purchase_price = db.Column(db.String(100), nullable=True)
+    opening_stock = db.Column(db.String(100), nullable=True)
+    min_stock = db.Column(db.String(100), nullable=True)
+    max_stock = db.Column(db.String(100), nullable=True)
+    main_rack_no = db.Column(db.String(100), nullable=True)
+    sub_rack_no = db.Column(db.String(100), nullable=True)
+
+
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
 
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
 
 
 @app.route('/')
-def index():
-    return render_template('dashboard.html')
+@app.route('/dashboard')
+@login_required
+def dashboard(methods=['GET', 'POST']):
+    return render_template('dashboard.html', user=current_user)
 
 
 
@@ -188,7 +255,33 @@ def get_users(parm):
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
 
+
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = Users.query.filter_by(username=username).first()
+        if user:
+            if user.password == password:
+                login_user(user)
+                return redirect(url_for('dashboard'))
+        return 'Invalid username or password'
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+
+
 @app.route('/addProductCategory', methods=['POST', 'GET'])
+@login_required
 def addProductCategory():
     
     if request.method == 'POST':
@@ -213,6 +306,7 @@ def addProductCategory():
 
 
 @app.route('/viewProductCategory', methods=['GET', 'POST'])
+@login_required
 def viewProductCategory():
     if request.method == 'GET':
         try:
@@ -224,6 +318,7 @@ def viewProductCategory():
     return render_template('viewProductCategory.html')
 
 @app.route('/editProductCategory/<id>', methods=['GET', 'POST'])
+@login_required
 def editProductCategory(id):
     prod_cat = ProductCategory.query.get_or_404(id)
     if request.method == 'POST':
@@ -256,6 +351,7 @@ def editProductCategory(id):
     return render_template('editProductCategory.html', prod_cat=prod_cat)
 
 @app.route('/deleteProductCategory/<id>', methods=['GET', 'POST'])
+@login_required
 def deleteProductCategory(id):
     prod_cat = ProductCategory.query.get_or_404(id)
     try:
@@ -267,3 +363,35 @@ def deleteProductCategory(id):
     except Exception as e:
         return jsonify({'return': 'error deleting product category :- '+str(e)})
     
+
+@app.route('/addProductSubCategory/<id>', methods=['POST', 'GET'])
+@login_required
+def addProductSubCategory(id):   
+    if request.method == 'POST':
+        try: 
+            with app.app_context():
+                img = request.files.get('subcategory_image_url')
+                img_filename = secure_filename(request.files['subcategory_image_url'].filename)
+                basedir = os.path.abspath(os.path.dirname(__file__))
+                prod_subcat = ProductSubCategory(fk_prod_cat_id=id,
+                    subcategory_name_en=request.form['subcategory_name_en'], 
+                    subcategory_name_ar=request.form['subcategory_name_ar'],
+                    subcategory_image_url=img_filename,
+                    subcategory_desc_en=request.form['subcategory_desc_en'],
+                    subcategory_desc_ar=request.form['subcategory_desc_ar']  
+                )
+                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                db.session.add(prod_subcat)
+                db.session.commit()
+            return redirect(url_for('viewProductSubCategory', id=id))
+        except Exception as e:
+            return jsonify({'return': 'error adding product sub category :- '+str(e)})
+    return render_template('addProductSubCategory.html')
+    
+
+@app.route('/viewProductSubCategory/<id>/<name>', methods=['GET', 'POST'])
+@login_required
+def viewProductSubCategory(id,name):
+    prod_subcat = ProductSubCategory.query.filter_by(fk_prod_cat_id=id).all()
+    return render_template('viewProductSubCategory.html', prod_subcat=prod_subcat, name=name)
+       
