@@ -6,11 +6,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 
+from werkzeug.utils import secure_filename
 import json
+
+
+
 
 
 app = Flask(__name__)
 app.secret_key = 'asdasdasdasdasdasdasdaveqvq34c'
+
+UPLOAD_FOLDER = 'static/img/uploads/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 ENV = 'dev'
@@ -61,6 +68,25 @@ class Users(db.Model):
     latitude = db.Column(db.String(100), nullable=True)
     longitude = db.Column(db.String(100), nullable=True)
 
+    prod_cat = db.relationship('ProductCategory', backref='prod_cat')
+
+
+class ProductCategory(db.Model):
+    __tablename__ = 'productcategory'
+    id = db.Column(db.Integer, primary_key=True)
+    category_name_en = db.Column(db.String(100), nullable=False)
+    category_name_ar = db.Column(db.String(100), nullable=True)
+    category_order = db.Column(db.String(100), nullable=True)
+    category_image_url = db.Column(db.String(100), nullable=True)
+    category_desc_en = db.Column(db.String(100), nullable=True)
+    category_desc_ar = db.Column(db.String(100), nullable=True)
+    active = db.Column(db.String(100), nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+# class ProductSubCategory(db.Model):
+
 
 
 
@@ -70,6 +96,11 @@ class Users(db.Model):
 @app.route('/')
 def index():
     return render_template('dashboard.html')
+
+
+
+
+## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
 
 @app.route('/insert_users', methods=['POST'])
 def insert_users():
@@ -142,3 +173,41 @@ def get_users(parm):
         except Exception as e:
             return jsonify({'return': 'error getting users : '+ str(e)})
     return jsonify({'return': 'no GET request'})
+
+## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
+
+@app.route('/addProductCategory', methods=['POST', 'GET'])
+def addProductCategory():
+    
+    if request.method == 'POST':
+        try: 
+            with app.app_context():
+                img = request.files.get('category_image_url')
+                img_filename = secure_filename(request.files['category_image_url'].filename)
+                basedir = os.path.abspath(os.path.dirname(__file__))
+                prod_cat = ProductCategory(category_name_en=request.form['category_name_en'], 
+                    category_name_ar=request.form['category_name_ar'],
+                    category_image_url=img_filename,
+                    category_desc_en=request.form['category_desc_en'],
+                    category_desc_ar=request.form['category_desc_ar']  
+                )
+                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                db.session.add(prod_cat)
+                db.session.commit()
+            return jsonify({'return': 'product category added successfully'})
+        except Exception as e:
+            return jsonify({'return': 'error adding product category :- '+str(e)})
+    return render_template('addProductCategory.html')
+
+
+@app.route('/viewProductCategory', methods=['GET', 'POST'])
+def viewProductCategory():
+    if request.method == 'GET':
+        try:
+            with app.app_context():
+                prod_cat = ProductCategory.query.all()
+                return render_template('viewProductCategory.html', prod_cat=prod_cat)
+        except Exception as e:
+            return jsonify({'return': 'error getting product category :- '+str(e)})
+    return render_template('viewProductCategory.html')
+
