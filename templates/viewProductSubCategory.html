@@ -45,13 +45,13 @@
                                     <td>{{productCategory.subcategory_name_en}}</td>
                                     <td>{{productCategory.subcategory_name_ar}}</td>
                                     <td>{{productCategory.subcategory_order}}</td>
-                                    <td><div style="text-align: center; "><img src="static/img/uploads/{{productCategory.subcategory_image_url}}" alt="{{productCategory.subcategory_image_url}}" style="max-width:100px;"></div></td>
+                                    <td><div style="text-align: center; "><img src="/static/img/uploads/{{productCategory.subcategory_image_url}}" alt="{{productCategory.subcategory_image_url}}" style="max-width:100px;"></div></td>
                                     <td>{{productCategory.subcategory_desc_en}}</td>
                                     <td>{{productCategory.subcategory_desc_ar}}</td>
                                     <td>{{productCategory.subcategory_active}}</td>
                                     <td>
-                                        <a href="{{url_for('editProductCategory', id=productCategory.id)}}" class="btn btn-warning" style="font-size: x-small; width: fit-content;">Edit</a>
-                                        <a href="{{url_for('deleteProductCategory', id=productCategory.id)}}" class="btn btn-danger" style="font-size: x-small; width: fit-content;">Delete</a>
+                                        <a href="{{url_for('editProductSubCategory', id=productCategory.id, name=productCategory.subcategory_name_en)}}" class="btn btn-warning" style="font-size: x-small; width: fit-content;">Edit</a>
+                                        <a href="{{url_for('deleteProductSubCategory', id=productCategory.id)}}" class="btn btn-danger" style="font-size: x-small; width: fit-content;">Delete</a>
                                     </td>
                                 </tr>
                                 {% endfor %}

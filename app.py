@@ -102,7 +102,7 @@ class ProductSubCategory(db.Model):
     active = db.Column(db.String(100), nullable=True)
 
     # fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    sub_product = db.relationship('Products', backref='product')
+    sub_product = db.relationship('Products', backref='products')
     fk_prod_cat_id = db.Column(db.Integer, db.ForeignKey('productcategory.id'))
 
 
@@ -130,7 +130,8 @@ class Products(db.Model):
     cat = db.Column(db.Integer, db.ForeignKey('productcategory.id'))
     subcat = db.Column(db.Integer, db.ForeignKey('productsubcategory.id'))
 
-    product_image = db.relationship('ProductImage', backref='product_image')
+    product_image = db.relationship('ProductImages', backref='product_image')
+    product_stock = db.relationship('ProductStock', backref='product_stock')
 
 
 class ProductImages(db.Model):
@@ -143,7 +144,7 @@ class ProductImages(db.Model):
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
-class product_stock(db.Model):
+class ProductStock(db.Model):
     __tablename__ = 'productstock'
     id = db.Column(db.Integer, primary_key=True)
     product_price = db.Column(db.String(100), nullable=True)
@@ -363,7 +364,7 @@ def deleteProductCategory(id):
     except Exception as e:
         return jsonify({'return': 'error deleting product category :- '+str(e)})
     
-
+import time
 @app.route('/addProductSubCategory/<id>', methods=['POST', 'GET'])
 @login_required
 def addProductSubCategory(id):   
@@ -383,7 +384,7 @@ def addProductSubCategory(id):
                 img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
                 db.session.add(prod_subcat)
                 db.session.commit()
-            return redirect(url_for('viewProductSubCategory', id=id))
+            return redirect(url_for('viewProductCategory'))
         except Exception as e:
             return jsonify({'return': 'error adding product sub category :- '+str(e)})
     return render_template('addProductSubCategory.html')
@@ -395,3 +396,48 @@ def viewProductSubCategory(id,name):
     prod_subcat = ProductSubCategory.query.filter_by(fk_prod_cat_id=id).all()
     return render_template('viewProductSubCategory.html', prod_subcat=prod_subcat, name=name)
        
+@app.route('/editProductSubCategory/<id>/<name>', methods=['GET', 'POST'])
+@login_required
+def editProductSubCategory(id,name):
+    prod_subcat = ProductSubCategory.query.get_or_404(id)
+    if request.method == 'POST':
+        print(prod_subcat)
+        try:
+            # with app.app_context():
+            img = request.files.get('subcategory_image_url')
+            img_filename = secure_filename(request.files['subcategory_image_url'].filename)
+            basedir = os.path.abspath(os.path.dirname(__file__))
+
+            if img_filename == prod_subcat.subcategory_image_url:
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+
+                
+
+            prod_subcat.subcategory_name_en=request.form['subcategory_name_en']
+            prod_subcat.subcategory_name_ar=request.form['subcategory_name_ar']
+            prod_subcat.subcategory_image_url=img_filename
+            prod_subcat.subcategory_desc_en=request.form['subcategory_desc_en']
+            prod_subcat.subcategory_desc_ar=request.form['subcategory_desc_ar']  
+            
+            
+            img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            
+            db.session.commit()
+            
+            return redirect(url_for('viewProductSubCategory', id=prod_subcat.fk_prod_cat_id, name=name))
+        except Exception as e:
+            return jsonify({'return': 'error getting product sub category :- '+str(e)})
+    return render_template('editProductSubCategory.html', prod_subcat=prod_subcat , name=name)
+
+@app.route('/deleteProductSubCategory/<id>', methods=['GET', 'POST'])
+@login_required
+def deleteProductSubCategory(id):
+    prod_subcat = ProductSubCategory.query.get_or_404(id)
+    try:
+        
+        db.session.delete(prod_subcat)
+        db.session.commit()
+
+        return redirect(url_for('viewProductSubCategory',id=prod_subcat.fk_prod_cat_id,name=prod_subcat.subcategory_name_en))
+    except Exception as e:
+        return jsonify({'return': 'error deleting product sub category :- '+str(e)})
