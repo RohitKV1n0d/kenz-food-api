@@ -1,5 +1,5 @@
 #flask boilerpalte
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, url_for ,redirect
 #sql
 from flask_sqlalchemy import SQLAlchemy
 #migration
@@ -85,7 +85,19 @@ class ProductCategory(db.Model):
     fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
-# class ProductSubCategory(db.Model):
+class ProductSubCategory(db.Model):
+    __tablename__ = 'productsubcategory'
+    id = db.Column(db.Integer, primary_key=True)
+    subcategory_name_en = db.Column(db.String(100), nullable=False)
+    subcategory_name_ar = db.Column(db.String(100), nullable=True)
+    subcategory_order = db.Column(db.String(100), nullable=True)
+    subcategory_image_url = db.Column(db.String(100), nullable=True)
+    subcategory_desc_en = db.Column(db.String(100), nullable=True)
+    subcategory_desc_ar = db.Column(db.String(100), nullable=True)
+    active = db.Column(db.String(100), nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_prod_cat_id = db.Column(db.Integer, db.ForeignKey('productcategory.id'))
 
 
 
@@ -194,7 +206,7 @@ def addProductCategory():
                 img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
                 db.session.add(prod_cat)
                 db.session.commit()
-            return jsonify({'return': 'product category added successfully'})
+            return redirect(url_for('viewProductCategory'))
         except Exception as e:
             return jsonify({'return': 'error adding product category :- '+str(e)})
     return render_template('addProductCategory.html')
@@ -211,3 +223,47 @@ def viewProductCategory():
             return jsonify({'return': 'error getting product category :- '+str(e)})
     return render_template('viewProductCategory.html')
 
+@app.route('/editProductCategory/<id>', methods=['GET', 'POST'])
+def editProductCategory(id):
+    prod_cat = ProductCategory.query.get_or_404(id)
+    if request.method == 'POST':
+        print(prod_cat)
+        try:
+            # with app.app_context():
+            img = request.files.get('category_image_url')
+            img_filename = secure_filename(request.files['category_image_url'].filename)
+            basedir = os.path.abspath(os.path.dirname(__file__))
+
+            if img_filename == prod_cat.category_image_url:
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+
+                
+
+            prod_cat.category_name_en=request.form['category_name_en']
+            prod_cat.category_name_ar=request.form['category_name_ar']
+            prod_cat.category_image_url=img_filename
+            prod_cat.category_desc_en=request.form['category_desc_en']
+            prod_cat.category_desc_ar=request.form['category_desc_ar']  
+            
+            
+            img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            
+            db.session.commit()
+            
+            return redirect(url_for('viewProductCategory'))
+        except Exception as e:
+            return jsonify({'return': 'error getting product category :- '+str(e)})
+    return render_template('editProductCategory.html', prod_cat=prod_cat)
+
+@app.route('/deleteProductCategory/<id>', methods=['GET', 'POST'])
+def deleteProductCategory(id):
+    prod_cat = ProductCategory.query.get_or_404(id)
+    try:
+        
+        db.session.delete(prod_cat)
+        db.session.commit()
+
+        return redirect(url_for('viewProductCategory'))
+    except Exception as e:
+        return jsonify({'return': 'error deleting product category :- '+str(e)})
+    

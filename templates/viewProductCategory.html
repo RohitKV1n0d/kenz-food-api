@@ -45,13 +45,13 @@
                                     <td>{{productCategory.category_name_en}}</td>
                                     <td>{{productCategory.category_name_ar}}</td>
                                     <td>{{productCategory.category_order}}</td>
-                                    <td><div style="text-align: center;"><img src="static/img/uploads/{{productCategory.category_image_url}}" alt="{{productCategory.category_image_url}}" style="max-width: 10%;"></div></td>
+                                    <td><div style="text-align: center; "><img src="static/img/uploads/{{productCategory.category_image_url}}" alt="{{productCategory.category_image_url}}" style="max-width:100px;"></div></td>
                                     <td>{{productCategory.category_desc_en}}</td>
                                     <td>{{productCategory.category_desc_ar}}</td>
                                     <td>{{productCategory.category_active}}</td>
                                     <td>
-                                        <a href="/admin/productCategory/edit/{{productCategory.id}}" class="btn btn-success" style="font-size: x-small; width: fit-content;">Edit</a>
-                                        <a href="/admin/productCategory/delete/{{productCategory.id}}" class="btn btn-danger" style="font-size: x-small; width: fit-content;">Delete</a>
+                                        <a href="{{url_for('editProductCategory', id=productCategory.id)}}" class="btn btn-success" style="font-size: x-small; width: fit-content;">Edit</a>
+                                        <a href="{{url_for('deleteProductCategory', id=productCategory.id)}}" class="btn btn-danger" style="font-size: x-small; width: fit-content;">Delete</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
