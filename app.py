@@ -279,7 +279,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-
+                                            #-----Porduct category-----#
 
 @app.route('/addProductCategory', methods=['POST', 'GET'])
 @login_required
@@ -364,7 +364,12 @@ def deleteProductCategory(id):
     except Exception as e:
         return jsonify({'return': 'error deleting product category :- '+str(e)})
     
-import time
+                                             #-----Porduct category-----#
+
+
+
+                                            #-----Porduct sub category-----#
+
 @app.route('/addProductSubCategory/<id>', methods=['POST', 'GET'])
 @login_required
 def addProductSubCategory(id):   
@@ -384,7 +389,7 @@ def addProductSubCategory(id):
                 img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
                 db.session.add(prod_subcat)
                 db.session.commit()
-            return redirect(url_for('viewProductCategory'))
+            return redirect(url_for('viewProductSubCategory',id=id,name=request.form['subcategory_name_en']))
         except Exception as e:
             return jsonify({'return': 'error adding product sub category :- '+str(e)})
     return render_template('addProductSubCategory.html')
@@ -394,7 +399,7 @@ def addProductSubCategory(id):
 @login_required
 def viewProductSubCategory(id,name):
     prod_subcat = ProductSubCategory.query.filter_by(fk_prod_cat_id=id).all()
-    return render_template('viewProductSubCategory.html', prod_subcat=prod_subcat, name=name)
+    return render_template('viewProductSubCategory.html', prod_subcat=prod_subcat, name=name, id=id)
        
 @app.route('/editProductSubCategory/<id>/<name>', methods=['GET', 'POST'])
 @login_required
@@ -441,3 +446,119 @@ def deleteProductSubCategory(id):
         return redirect(url_for('viewProductSubCategory',id=prod_subcat.fk_prod_cat_id,name=prod_subcat.subcategory_name_en))
     except Exception as e:
         return jsonify({'return': 'error deleting product sub category :- '+str(e)})
+
+                                            #-----Porduct sub category-----#
+
+@app.route('/addProduct', methods=['POST', 'GET'])
+@login_required
+def addProduct():
+    category = ProductCategory.query.all()
+    subcategory = ProductSubCategory.query.all()
+    if request.method == 'POST':
+        try: 
+            with app.app_context():
+        
+                prod = Products(
+                    product_name_en=request.form['product_name_en'], 
+                    product_name_ar=request.form['product_name_ar'],
+                    product_desc_en=request.form['product_desc_en'],
+                    product_desc_ar=request.form['product_desc_ar'],
+                    unit_id=request.form['unit'],
+                    unit_quantity=request.form['unit_quantity']
+                )
+                db.session.add(prod)
+                db.session.commit()
+                prod_img = request.files.getlist('product_image_url')
+                for img in prod_img:
+                    img_filename = secure_filename(img.filename)
+                    basedir = os.path.abspath(os.path.dirname(__file__))
+                    prod_img = ProductImages(fk_product_id=prod.id,
+                        product_image_url=img_filename
+                    )
+                    img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                    db.session.add(prod_img)
+                    db.session.commit()
+
+                prod_stock = ProductStock(fk_product_id=prod.id,
+                        product_price=request.form['product_price'],
+                        product_offer_price=request.form['product_offer_price'],
+                        product_purchase_price=request.form['product_purchase_price'],
+                        opening_stock=request.form['opening_stock'],
+                        min_stock=request.form['min_stock'],
+                        max_stock=request.form['max_stock']
+                )
+                db.session.add(prod_stock)
+                db.session.commit()
+
+
+            return redirect(url_for('viewProduct'))
+        except Exception as e:
+            return jsonify({'return': 'error adding product :- '+str(e)})
+    return render_template('addProduct.html', category=category, subcategory=subcategory)
+
+
+
+
+@app.route('/viewProduct', methods=['GET', 'POST'])
+@login_required
+def viewProduct():
+    prod = Products.query.all()
+    prod_img = ProductImages.query.all()
+    prod_stock = ProductStock.query.all()
+    return render_template('viewProduct.html', prod=prod, prod_img=prod_img,zip=zip, prod_stock=prod_stock)
+
+
+@app.route('/editProduct/<id>/<name>', methods=['GET', 'POST'])
+@login_required
+def editProduct(id,name):
+    prod = Products.query.get_or_404(id)
+    prod_img = ProductImages.query.filter_by(fk_product_id=id).all()
+    prod_stock = ProductStock.query.filter_by(fk_product_id=id).all()
+    if request.method == 'POST':
+        try:
+            with app.app_context():
+                prod.product_name_en=request.form['product_name_en']
+                prod.product_name_ar=request.form['product_name_ar']
+                prod.product_desc_en=request.form['product_desc_en']
+                prod.product_desc_er=request.form['product_desc_ar']
+                prod.unit_id=request.form['unit']
+                prod.unit_quantity=request.form['unit_quantity']
+                db.session.commit()
+                prod_img = request.files.getlist('product_image_url')
+                for img in prod_img:
+                    img_filename = secure_filename(img.filename)
+                    basedir = os.path.abspath(os.path.dirname(__file__))
+                    prod_img = ProductImages(fk_product_id=prod.id,
+                        product_image_url=img_filename
+                    )
+                    img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                    db.session.add(prod_img)
+                    db.session.commit()
+
+                prod_stock = ProductStock(fk_product_id=prod.id,
+                        product_price=request.form['product_price'],
+                        product_offer_price=request.form['product_offer_price'],
+                        product_purchase_price=request.form['product_purchase_price'],
+                        opening_stock=request.form['opening_stock'],
+                        min_stock=request.form['min_stock'],
+                        max_stock=request.form['max_stock']
+                )
+                db.session.add(prod_stock)
+                db.session.commit()
+            return redirect(url_for('viewProduct'))
+        except Exception as e:
+            return jsonify({'return': 'error getting product :- '+str(e)})
+    return render_template('editProduct.html', prod=prod, prod_img=prod_img, prod_stock=prod_stock , name=name)
+
+
+
+@app.route('/deleteProduct/<id>', methods=['GET', 'POST'])
+@login_required
+def deleteProduct(id):
+    prod = Products.query.get_or_404(id)
+    try:
+        db.session.delete(prod)
+        db.session.commit()
+        return redirect(url_for('viewProduct'))
+    except Exception as e:
+        return jsonify({'return': 'error deleting product :- '+str(e)})
