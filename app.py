@@ -17,9 +17,9 @@ import json
 
 
 app = Flask(__name__)
-app.secret_key = 'asdasdasdasdasdasdasdaveqvq34c'
+app.secret_key = 'asdasdasdasdasdasdasaasdasdasdasd12312312daveqvq34c'
 
-UPLOAD_FOLDER = '/static/img/uploads/'
+UPLOAD_FOLDER = 'static/img/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
