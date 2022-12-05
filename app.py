@@ -23,7 +23,7 @@ UPLOAD_FOLDER = 'static/img/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-ENV = 'dev'
+ENV = 'prod'
 
 if ENV == 'dev' :
     app.debug = True
