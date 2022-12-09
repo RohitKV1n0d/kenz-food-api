@@ -353,79 +353,117 @@ def get_product():
         if request.args.get('parm') ==  'product_id':
             try:
                 get_product = Products.query.filter_by(id=request.args.get('id')).first()
-                product_json = {
-                    # 'id': get_product.id,
-                    'product_name_en': get_product.product_name_en,
-                    'product_name_ar': get_product.product_name_ar,
-                    'product_desc_en': get_product.product_desc_en,
-                    'product_desc_ar': get_product.product_desc_ar,
-                
-                }
-                return jsonify({'return': 'success', 'product': product_json})
+                if get_product:
+                    product_json = {
+                        # 'id': get_product.id,
+                        'product_name_en': get_product.product_name_en,
+                        'product_name_ar': get_product.product_name_ar,
+                        'product_desc_en': get_product.product_desc_en,
+                        'product_desc_ar': get_product.product_desc_ar,
+
+                    }
+                    return jsonify({'return': 'success', 'product': product_json})
+                else:
+                    return jsonify({'return': 'no product found'})
             except Exception as e:
                 return jsonify({'return': 'error getting product : '+ str(e)})
         elif request.args.get('parm') ==  'category_id':
             try:
-                get_products = Products.query.filter_by(fk_prod_subcat_id=request.args.get('id')).all()
-                products_json = []
-                for product in get_products:
-                    product_json = {
-                        'id': product.id,
-                        'product_name_en': product.product_name_en,
-                        'product_name_ar': product.product_name_ar,
-                        'product_desc_en': product.product_desc_en,
-                        'product_desc_ar': product.product_desc_ar,
-                        'product_order': product.product_order,
-                        'active': product.active,
-                    }
-                    products_json.append(product_json)
-                return jsonify({'return': 'success', 'products': products_json})
+                get_products = Products.query.filter_by(cat=int(request.args.get('id'))).all()
+                if get_products:
+                    products_json = []
+                    for product in get_products:
+                        product_json = {
+                            'id': product.id,
+                            'product_name_en': product.product_name_en,
+                            'product_name_ar': product.product_name_ar,
+                            'product_desc_en': product.product_desc_en,
+                            'product_desc_ar': product.product_desc_ar,
+                            'unit_quantity': product.unit_quantity,
+                            'product_code': product.product_code,
+                            'product_barcode': product.produc_barcode,
+                            'other_title_en': product.other_title_en,
+                            'other_title_ar': product.other_title_ar,
+                            'status': product.status,
+                            'fast_delivery': product.fast_delivery,
+                            'featured': product.featured,
+                            'fresh': product.fresh,
+                            'offer': product.offer,
+                            'product_cat_id': product.cat,
+                            'product_subcat_id': product.subcat,
+                            'cat_id': product.cat,
+                            'subcat_id': product.subcat,
+                        }
+                        products_json.append(product_json)
+                    return jsonify({'return': 'success', 'products': products_json})
+                else:
+                    return jsonify({'return': 'no products'})
             except Exception as e:
                 return jsonify({'return': 'error getting products : '+ str(e)})
         elif request.args.get('parm') ==  'subcategory_id':
             try:
-                get_products = Products.query.filter_by(fk_prod_subcat_id=request.args.get('id')).all()
-                products_json = []
-                for product in get_products:
-                    product_json = {
-                        'id': product.id,
-                        'product_name_en': product.product_name_en,
-                        'product_name_ar': product.product_name_ar,
-                        'product_desc_en': product.product_desc_en,
-                        'product_desc_ar': product.product_desc_ar,
-                        'product_order': product.product_order,
-                        'active': product.active,
-                    }
-                    products_json.append(product_json)
-                return jsonify({'return': 'success', 'products': products_json})
+                get_products = Products.query.filter_by(subcat=request.args.get('id')).all()
+                if get_products:
+                    products_json = []
+                    for product in get_products:
+                        product_json = {
+                            'id': product.id,
+                            'product_name_en': product.product_name_en,
+                            'product_name_ar': product.product_name_ar,
+                            'product_desc_en': product.product_desc_en,
+                            'product_desc_ar': product.product_desc_ar,
+                            'unit_quantity': product.unit_quantity,
+                            'product_code': product.product_code,
+                            'product_barcode': product.produc_barcode,
+                            'other_title_en': product.other_title_en,
+                            'other_title_ar': product.other_title_ar,
+                            'status': product.status,
+                            'fast_delivery': product.fast_delivery,
+                            'featured': product.featured,
+                            'fresh': product.fresh,
+                            'offer': product.offer,
+                            'product_cat_id': product.cat,
+                            'product_subcat_id': product.subcat,
+                            'cat_id': product.cat,
+                            'subcat_id': product.subcat,
+                        }
+                        products_json.append(product_json)
+                    return jsonify({'return': 'success', 'products': products_json})
+                else:
+                    return jsonify({'return': 'no products'})
             except Exception as e:
                 return jsonify({'return': 'error getting products : '+ str(e)})
         elif request.args.get('parm') ==  'all':
             try:
                 get_products = Products.query.all()
-                products_json = []
-                for product in get_products:
-                    product_json = {
-                        'id': product.id,
-                        'product_name_en': product.product_name_en,
-                        'product_name_ar': product.product_name_ar,
-                        'product_desc_en': product.product_desc_en,
-                        'product_desc_ar': product.product_desc_ar,
-                        'unit_quantity': product.unit_quantity,
-                        'product_code': product.product_code,
-                        'product_barcode': product.produc_barcode,
-                        'other_title_en': product.other_title_en,
-                        'other_title_ar': product.other_title_ar,
-                        'status': product.status,
-                        'fast_delivery': product.fast_delivery,
-                        'featured': product.featured,
-                        'fresh': product.fresh,
-                        'offer': product.offer,
-                        'product_cat_id': product.cat,
-                        'product_subcat_id': product.subcat,
-                    }
-                    products_json.append(product_json)
-                return jsonify({'return': 'success', 'products': products_json})
+                if get_products:
+                    products_json = []
+                    for product in get_products:
+                        product_json = {
+                            'id': product.id,
+                            'product_name_en': product.product_name_en,
+                            'product_name_ar': product.product_name_ar,
+                            'product_desc_en': product.product_desc_en,
+                            'product_desc_ar': product.product_desc_ar,
+                            'unit_quantity': product.unit_quantity,
+                            'product_code': product.product_code,
+                            'product_barcode': product.produc_barcode,
+                            'other_title_en': product.other_title_en,
+                            'other_title_ar': product.other_title_ar,
+                            'status': product.status,
+                            'fast_delivery': product.fast_delivery,
+                            'featured': product.featured,
+                            'fresh': product.fresh,
+                            'offer': product.offer,
+                            'product_cat_id': product.cat,
+                            'product_subcat_id': product.subcat,
+                            'cat_id': product.cat,
+                            'subcat_id': product.subcat,
+                        }
+                        products_json.append(product_json)
+                    return jsonify({'return': 'success', 'products': products_json})
+                else:
+                    return jsonify({'return': 'no products'})
             except Exception as e:
                 return jsonify({'return': 'error getting products : '+ str(e)})
 
@@ -642,7 +680,9 @@ def addProduct():
                     product_desc_en=request.form['product_desc_en'],
                     product_desc_ar=request.form['product_desc_ar'],
                     unit_id=request.form['unit'],
-                    unit_quantity=request.form['unit_quantity']
+                    unit_quantity=request.form['unit_quantity'],
+                    cat=request.form['category'],
+                    subcat=request.form['subcategory']
                 )
                 db.session.add(prod)
                 db.session.commit()
