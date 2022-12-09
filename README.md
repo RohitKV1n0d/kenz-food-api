@@ -205,8 +205,13 @@
     <p>Get all Products based on parm input</p>
     <p>URL: /get_products</p>
     <p>Method : GET</p>
-    <p>Parameters : product_id, category_id, subcategory_id</p>
-    <p>Example : http://kenz-food-api.herokuapp.com/get_products?category_id=1&subcategory_id=1</p>
+    <p>Parameters : parm, id</p>
+    <ol>
+        <li>parm = {product_id, category_id, subcategory_id, all}</li>
+        <li>id = {id}</li>
+        <p><b>*(parm=all) requires no id</b></p>
+    </ol>
+    <p>Example : http://kenz-food-api.herokuapp.com/get_product?parm=category_id&id=1</p>
 
     Response Body: JSON Object
     Example:
