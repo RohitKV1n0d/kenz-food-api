@@ -255,6 +255,155 @@ def get_users(parm):
             return jsonify({'return': 'error getting users : '+ str(e)})
     return jsonify({'return': 'no GET request'})
 
+
+@app.route('/get_categories', methods=['GET'])
+def get_categories():
+    if request.method == 'GET':
+        try:
+            categories = ProductCategory.query.all()
+            categories_json = []
+            for category in categories:
+                category_json = {
+                    'id': category.id,
+                    'category_name_en': category.category_name_en,
+                    'category_name_ar': category.category_name_ar,
+                    'category_desc_en': category.category_desc_en,
+                    'category_desc_ar': category.category_desc_ar,
+                    'category_image_url': category.category_image_url,
+                    'category_order': category.category_order,
+                    'active': category.active,
+                }
+                categories_json.append(category_json)
+            return jsonify({'return': 'success', 'categories': categories_json})
+        except Exception as e:
+            return jsonify({'return': 'error getting categories : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+
+
+@app.route('/get_subcategory', methods=['GET'])
+def get_subcategory():
+    if request.method == 'GET':
+        try:
+            get_subcategory = ProductSubCategory.query.filter_by(fk_prod_cat_id=request.args.get('category_id')).all()
+            subcategories_json = []
+            for subcategory in get_subcategory:
+                subcategory_json = {
+                    'id': subcategory.id,
+                    'subcategory_name_en': subcategory.subcategory_name_en,
+                    'subcategory_name_ar': subcategory.subcategory_name_ar,
+                    'subcategory_desc_en': subcategory.subcategory_desc_en,
+                    'subcategory_desc_ar': subcategory.subcategory_desc_ar,
+                    'subcategory_image_url': subcategory.subcategory_image_url,
+                    'subcategory_order': subcategory.subcategory_order,
+                    'active': subcategory.active,
+                }
+                subcategories_json.append(subcategory_json)
+            return jsonify({'return': 'success', 'subcategories': subcategories_json})
+        except Exception as e:
+            return jsonify({'return': 'error getting subcategories : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+
+
+@app.route('/get_products_images', methods=['GET'])
+def get_products_images():
+    if request.method == 'GET':
+        try:
+            get_products_images = ProductImages.query.filter_by(fk_product_id=request.args.get('product_id')).all()
+            products_images_json = []
+            for product_image in get_products_images:
+                product_image_json = {
+                    'id': product_image.id,
+                    'image_url': product_image.image_url,
+                    'active': product_image.active,
+                }
+                products_images_json.append(product_image_json)
+            return jsonify({'return': 'success', 'product_images': products_images_json})
+        except Exception as e:
+            return jsonify({'return': 'error getting product images : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+
+@app.route('/get_product_stocks', methods=['GET'])
+def get_product_stocks():
+    if request.method == 'GET':
+        try:
+            get_product_stocks = ProductStock.query.filter_by(fk_product_id=request.args.get('product_id')).all()
+            product_stocks_json = []
+            for product_stock in get_product_stocks:
+                product_stock_json = {
+                    'id': product_stock.id,
+                    'product_price': product_stock.product_price,
+                    'product_offer_price': product_stock.product_offer_price,
+                    'product_purchase_price': product_stock.product_purchase_price,
+                    'opening_stock': product_stock.opening_stock,
+                    'min_stock': product_stock.min_stock,
+                    'max_stock': product_stock.max_stock,
+                    'main_rack_no': product_stock.main_rack_no,
+                    'sub_rack_no': product_stock.sub_rack_no
+                }
+                product_stocks_json.append(product_stock_json)
+            return jsonify({'return': 'success', 'product_stocks': product_stocks_json})
+        except Exception as e:
+            return jsonify({'return': 'error getting product stocks : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+
+
+@app.route('/get_product', methods=['GET'])
+def get_product():
+    if request.method == 'GET':
+        if request.args.get('parm') ==  'product_id':
+            try:
+                get_product = Products.query.filter_by(id=request.args.get('product_id')).first()
+                product_json = {
+                    # 'id': get_product.id,
+                    'product_name_en': get_product.product_name_en,
+                    'product_name_ar': get_product.product_name_ar,
+                    'product_desc_en': get_product.product_desc_en,
+                    'product_desc_ar': get_product.product_desc_ar,
+                
+                }
+                return jsonify({'return': 'success', 'product': product_json})
+            except Exception as e:
+                return jsonify({'return': 'error getting product : '+ str(e)})
+        elif request.args.get('parm') ==  'category_id':
+            try:
+                get_products = Products.query.filter_by(fk_prod_subcat_id=request.args.get('category_id')).all()
+                products_json = []
+                for product in get_products:
+                    product_json = {
+                        'id': product.id,
+                        'product_name_en': product.product_name_en,
+                        'product_name_ar': product.product_name_ar,
+                        'product_desc_en': product.product_desc_en,
+                        'product_desc_ar': product.product_desc_ar,
+                        'product_order': product.product_order,
+                        'active': product.active,
+                    }
+                    products_json.append(product_json)
+                return jsonify({'return': 'success', 'products': products_json})
+            except Exception as e:
+                return jsonify({'return': 'error getting products : '+ str(e)})
+        elif request.args.get('parm') ==  'subcategory_id':
+            try:
+                get_products = Products.query.filter_by(fk_prod_subcat_id=request.args.get('subcategory_id')).all()
+                products_json = []
+                for product in get_products:
+                    product_json = {
+                        'id': product.id,
+                        'product_name_en': product.product_name_en,
+                        'product_name_ar': product.product_name_ar,
+                        'product_desc_en': product.product_desc_en,
+                        'product_desc_ar': product.product_desc_ar,
+                        'product_order': product.product_order,
+                        'active': product.active,
+                    }
+                    products_json.append(product_json)
+                return jsonify({'return': 'success', 'products': products_json})
+            except Exception as e:
+                return jsonify({'return': 'error getting products : '+ str(e)})
+
+
+
+
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
 
 
@@ -563,3 +712,5 @@ def deleteProduct(id):
         return redirect(url_for('viewProduct'))
     except Exception as e:
         return jsonify({'return': 'error deleting product :- '+str(e)})
+
+
