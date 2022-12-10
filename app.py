@@ -10,7 +10,8 @@ import os
 
 
 from werkzeug.utils import secure_filename
-import json
+import requests, json
+import pyimgur
 
 
 
@@ -23,15 +24,17 @@ UPLOAD_FOLDER = 'static/img/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+CLIENT_ID = "2d3158d36137249"
+im = pyimgur.Imgur(CLIENT_ID)
+
+
 ENV = 'prod'
 
 if ENV == 'dev' :
     app.debug = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
     app.config['SECRET_KEY'] = 'asdasdasdasdasdasdasdaveqvq34c'
-    
-   
-        
+    # PATH = "C:/Users/USER/Desktop/Hash IT/kenz-food-api/kenz-food-api/kenz-api/static/img/uploads/"
 
 else:
     app.debug = False
@@ -309,15 +312,17 @@ def get_products_images():
     if request.method == 'GET':
         try:
             get_products_images = ProductImages.query.filter_by(fk_product_id=request.args.get('product_id')).all()
-            products_images_json = []
-            for product_image in get_products_images:
-                product_image_json = {
-                    'id': product_image.id,
-                    'image_url': product_image.image_url,
-                    'active': product_image.active,
-                }
-                products_images_json.append(product_image_json)
-            return jsonify({'return': 'success', 'product_images': products_images_json})
+            if get_products_images:
+                products_images_json = []
+                for product_image in get_products_images:
+                    product_image_json = {
+                        'id': product_image.id,
+                        'image_url': product_image.product_image_url,
+                    }
+                    products_images_json.append(product_image_json)
+                return jsonify({'return': 'success', 'product_images': products_images_json})
+            else:
+                return jsonify({'return': 'no product images found'})
         except Exception as e:
             return jsonify({'return': 'error getting product images : '+ str(e)})
     return jsonify({'return': 'no GET request'})
@@ -327,21 +332,24 @@ def get_product_stocks():
     if request.method == 'GET':
         try:
             get_product_stocks = ProductStock.query.filter_by(fk_product_id=request.args.get('product_id')).all()
-            product_stocks_json = []
-            for product_stock in get_product_stocks:
-                product_stock_json = {
-                    'id': product_stock.id,
-                    'product_price': product_stock.product_price,
-                    'product_offer_price': product_stock.product_offer_price,
-                    'product_purchase_price': product_stock.product_purchase_price,
-                    'opening_stock': product_stock.opening_stock,
-                    'min_stock': product_stock.min_stock,
-                    'max_stock': product_stock.max_stock,
-                    'main_rack_no': product_stock.main_rack_no,
-                    'sub_rack_no': product_stock.sub_rack_no
-                }
-                product_stocks_json.append(product_stock_json)
-            return jsonify({'return': 'success', 'product_stocks': product_stocks_json})
+            if get_product_stocks:
+                product_stocks_json = []
+                for product_stock in get_product_stocks:
+                    product_stock_json = {
+                        'id': product_stock.id,
+                        'product_price': product_stock.product_price,
+                        'product_offer_price': product_stock.product_offer_price,
+                        'product_purchase_price': product_stock.product_purchase_price,
+                        'opening_stock': product_stock.opening_stock,
+                        'min_stock': product_stock.min_stock,
+                        'max_stock': product_stock.max_stock,
+                        'main_rack_no': product_stock.main_rack_no,
+                        'sub_rack_no': product_stock.sub_rack_no
+                    }
+                    product_stocks_json.append(product_stock_json)
+                return jsonify({'return': 'success', 'product_stocks': product_stocks_json})
+            else:
+                return jsonify({'return': 'no product stocks found'})
         except Exception as e:
             return jsonify({'return': 'error getting product stocks : '+ str(e)})
     return jsonify({'return': 'no GET request'})
@@ -353,6 +361,7 @@ def get_product():
         if request.args.get('parm') ==  'product_id':
             try:
                 get_product = Products.query.filter_by(id=request.args.get('id')).first()
+                # get_product_stocks = ProductStock.query.filter_by(fk_product_id=request.args.get('id')).all()
                 if get_product:
                     product_json = {
                         # 'id': get_product.id,
@@ -372,7 +381,8 @@ def get_product():
                 get_products = Products.query.filter_by(cat=int(request.args.get('id'))).all()
                 if get_products:
                     products_json = []
-                    for product in get_products:
+                    products_stocks_json = []
+                    for product in get_products: 
                         product_json = {
                             'id': product.id,
                             'product_name_en': product.product_name_en,
@@ -383,7 +393,7 @@ def get_product():
                             'product_code': product.product_code,
                             'product_barcode': product.produc_barcode,
                             'other_title_en': product.other_title_en,
-                            'other_title_ar': product.other_title_ar,
+                            'other_title_ar': product.other_title_ar, 
                             'status': product.status,
                             'fast_delivery': product.fast_delivery,
                             'featured': product.featured,
@@ -393,7 +403,26 @@ def get_product():
                             'product_subcat_id': product.subcat,
                             'cat_id': product.cat,
                             'subcat_id': product.subcat,
+                            'product_stock': [],
+                            # 'product_price': product.product_stock,
                         }
+                        for product_stock in product.product_stock:
+                            product_stock_json = {
+                                'id': product_stock.id,
+                                'product_price': product_stock.product_price,
+                                'product_offer_price': product_stock.product_offer_price,
+                                'product_purchase_price': product_stock.product_purchase_price,
+                                'opening_stock': product_stock.opening_stock,
+                                'min_stock': product_stock.min_stock,
+                                'max_stock': product_stock.max_stock,
+                                'main_rack_no': product_stock.main_rack_no,
+                                'sub_rack_no': product_stock.sub_rack_no,
+                                'product_id': product_stock.fk_product_id,
+                            }
+                            products_stocks_json.append(product_stock_json)
+                            product_json['product_stock'] = products_stocks_json
+
+                        products_stocks_json = []
                         products_json.append(product_json)
                     return jsonify({'return': 'success', 'products': products_json})
                 else:
@@ -405,7 +434,8 @@ def get_product():
                 get_products = Products.query.filter_by(subcat=request.args.get('id')).all()
                 if get_products:
                     products_json = []
-                    for product in get_products:
+                    products_stocks_json = []
+                    for product in get_products: 
                         product_json = {
                             'id': product.id,
                             'product_name_en': product.product_name_en,
@@ -416,7 +446,7 @@ def get_product():
                             'product_code': product.product_code,
                             'product_barcode': product.produc_barcode,
                             'other_title_en': product.other_title_en,
-                            'other_title_ar': product.other_title_ar,
+                            'other_title_ar': product.other_title_ar, 
                             'status': product.status,
                             'fast_delivery': product.fast_delivery,
                             'featured': product.featured,
@@ -426,7 +456,26 @@ def get_product():
                             'product_subcat_id': product.subcat,
                             'cat_id': product.cat,
                             'subcat_id': product.subcat,
+                            'product_stock': [],
+                            # 'product_price': product.product_stock,
                         }
+                        for product_stock in product.product_stock:
+                            product_stock_json = {
+                                'id': product_stock.id,
+                                'product_price': product_stock.product_price,
+                                'product_offer_price': product_stock.product_offer_price,
+                                'product_purchase_price': product_stock.product_purchase_price,
+                                'opening_stock': product_stock.opening_stock,
+                                'min_stock': product_stock.min_stock,
+                                'max_stock': product_stock.max_stock,
+                                'main_rack_no': product_stock.main_rack_no,
+                                'sub_rack_no': product_stock.sub_rack_no,
+                                'product_id': product_stock.fk_product_id,
+                            }
+                            products_stocks_json.append(product_stock_json)
+                            product_json['product_stock'] = products_stocks_json
+
+                        products_stocks_json = []
                         products_json.append(product_json)
                     return jsonify({'return': 'success', 'products': products_json})
                 else:
@@ -438,7 +487,8 @@ def get_product():
                 get_products = Products.query.all()
                 if get_products:
                     products_json = []
-                    for product in get_products:
+                    products_stocks_json = []
+                    for product in get_products: 
                         product_json = {
                             'id': product.id,
                             'product_name_en': product.product_name_en,
@@ -449,7 +499,7 @@ def get_product():
                             'product_code': product.product_code,
                             'product_barcode': product.produc_barcode,
                             'other_title_en': product.other_title_en,
-                            'other_title_ar': product.other_title_ar,
+                            'other_title_ar': product.other_title_ar, 
                             'status': product.status,
                             'fast_delivery': product.fast_delivery,
                             'featured': product.featured,
@@ -459,7 +509,26 @@ def get_product():
                             'product_subcat_id': product.subcat,
                             'cat_id': product.cat,
                             'subcat_id': product.subcat,
+                            'product_stock': [],
+                            # 'product_price': product.product_stock,
                         }
+                        for product_stock in product.product_stock:
+                            product_stock_json = {
+                                'id': product_stock.id,
+                                'product_price': product_stock.product_price,
+                                'product_offer_price': product_stock.product_offer_price,
+                                'product_purchase_price': product_stock.product_purchase_price,
+                                'opening_stock': product_stock.opening_stock,
+                                'min_stock': product_stock.min_stock,
+                                'max_stock': product_stock.max_stock,
+                                'main_rack_no': product_stock.main_rack_no,
+                                'sub_rack_no': product_stock.sub_rack_no,
+                                'product_id': product_stock.fk_product_id,
+                            }
+                            products_stocks_json.append(product_stock_json)
+                            product_json['product_stock'] = products_stocks_json
+
+                        products_stocks_json = []
                         products_json.append(product_json)
                     return jsonify({'return': 'success', 'products': products_json})
                 else:
@@ -690,12 +759,14 @@ def addProduct():
                 for img in prod_img:
                     img_filename = secure_filename(img.filename)
                     basedir = os.path.abspath(os.path.dirname(__file__))
-                    prod_img = ProductImages(fk_product_id=prod.id,
-                        product_image_url=img_filename
-                    )
                     img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                    upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                    prod_img = ProductImages(fk_product_id=prod.id,
+                        product_image_url=upload_image.link
+                    )
                     db.session.add(prod_img)
                     db.session.commit()
+                    os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
 
                 prod_stock = ProductStock(fk_product_id=prod.id,
                         product_price=request.form['product_price'],
@@ -746,12 +817,16 @@ def editProduct(id,name):
                 for img in prod_img:
                     img_filename = secure_filename(img.filename)
                     basedir = os.path.abspath(os.path.dirname(__file__))
-                    prod_img = ProductImages(fk_product_id=prod.id,
-                        product_image_url=img_filename
-                    )
+                    
                     img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                    upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+
+                    prod_img = ProductImages(fk_product_id=prod.id,
+                        product_image_url=upload_image.link
+                    )
                     db.session.add(prod_img)
                     db.session.commit()
+                    os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
 
                 prod_stock = ProductStock(fk_product_id=prod.id,
                         product_price=request.form['product_price'],
