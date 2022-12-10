@@ -576,15 +576,17 @@ def addProductCategory():
                 img = request.files.get('category_image_url')
                 img_filename = secure_filename(request.files['category_image_url'].filename)
                 basedir = os.path.abspath(os.path.dirname(__file__))
+                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
                 prod_cat = ProductCategory(category_name_en=request.form['category_name_en'], 
                     category_name_ar=request.form['category_name_ar'],
-                    category_image_url=img_filename,
+                    category_image_url=upload_image.link,
                     category_desc_en=request.form['category_desc_en'],
                     category_desc_ar=request.form['category_desc_ar']  
                 )
-                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
                 db.session.add(prod_cat)
                 db.session.commit()
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
             return redirect(url_for('viewProductCategory'))
         except Exception as e:
             return jsonify({'return': 'error adding product category :- '+str(e)})
@@ -615,21 +617,23 @@ def editProductCategory(id):
             img_filename = secure_filename(request.files['category_image_url'].filename)
             basedir = os.path.abspath(os.path.dirname(__file__))
 
-            if img_filename == prod_cat.category_image_url:
-                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            # if img_filename == prod_cat.category_image_url:
+            #     os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
 
                 
 
-            prod_cat.category_name_en=request.form['category_name_en']
-            prod_cat.category_name_ar=request.form['category_name_ar']
-            prod_cat.category_image_url=img_filename
-            prod_cat.category_desc_en=request.form['category_desc_en']
-            prod_cat.category_desc_ar=request.form['category_desc_ar']  
+             
             
             
             img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
-            
+            upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+            prod_cat.category_name_en=request.form['category_name_en']
+            prod_cat.category_name_ar=request.form['category_name_ar']
+            prod_cat.category_image_url=upload_image.link
+            prod_cat.category_desc_en=request.form['category_desc_en']
+            prod_cat.category_desc_ar=request.form['category_desc_ar'] 
             db.session.commit()
+            os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
             
             return redirect(url_for('viewProductCategory'))
         except Exception as e:
@@ -664,16 +668,21 @@ def addProductSubCategory(id):
                 img = request.files.get('subcategory_image_url')
                 img_filename = secure_filename(request.files['subcategory_image_url'].filename)
                 basedir = os.path.abspath(os.path.dirname(__file__))
+                
+                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+
                 prod_subcat = ProductSubCategory(fk_prod_cat_id=id,
                     subcategory_name_en=request.form['subcategory_name_en'], 
                     subcategory_name_ar=request.form['subcategory_name_ar'],
-                    subcategory_image_url=img_filename,
+                    subcategory_image_url=upload_image.link,
                     subcategory_desc_en=request.form['subcategory_desc_en'],
                     subcategory_desc_ar=request.form['subcategory_desc_ar']  
                 )
-                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
                 db.session.add(prod_subcat)
                 db.session.commit()
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+
             return redirect(url_for('viewProductSubCategory',id=id,name=request.form['subcategory_name_en']))
         except Exception as e:
             return jsonify({'return': 'error adding product sub category :- '+str(e)})
@@ -698,21 +707,24 @@ def editProductSubCategory(id,name):
             img_filename = secure_filename(request.files['subcategory_image_url'].filename)
             basedir = os.path.abspath(os.path.dirname(__file__))
 
-            if img_filename == prod_subcat.subcategory_image_url:
-                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            # if img_filename == prod_subcat.subcategory_image_url:
+            #     os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
 
                 
 
+            img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+
             prod_subcat.subcategory_name_en=request.form['subcategory_name_en']
             prod_subcat.subcategory_name_ar=request.form['subcategory_name_ar']
-            prod_subcat.subcategory_image_url=img_filename
+            prod_subcat.subcategory_image_url=upload_image.link
             prod_subcat.subcategory_desc_en=request.form['subcategory_desc_en']
             prod_subcat.subcategory_desc_ar=request.form['subcategory_desc_ar']  
             
             
-            img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
             
             db.session.commit()
+            os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
             
             return redirect(url_for('viewProductSubCategory', id=prod_subcat.fk_prod_cat_id, name=name))
         except Exception as e:
