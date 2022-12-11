@@ -287,7 +287,30 @@
 
 </ul>
 
+<h3>Product Status</h3>
+<ul>
+    <p>Change and Check Product Status</p>
+    <p>URL: /changeProductStatus/{status}</p>
+    <p>Method : GET</p>
+    <p>Parameters : product_id, status</p>
+    <p>{status} = enable,diable,check</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/enable?id=8</p>
 
+    Request Body: JSON Object
+    Example:
+    {
+        "message": "product status changed",
+        "return": "success"
+    }
+
+    Example : http://kenz-food-api.herokuapp.com/check?id=8
+
+    {
+        "return": "success",
+        "status": "enable"
+    }
+
+</ul>
 
     
     
