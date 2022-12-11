@@ -12,18 +12,17 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
                         
-                        <a href="{{url_for('addProduct')}}" class="btn btn-success" style="text-align: right;">Add</a>
+                        <a href="{{url_for('addProduct')}}" class="btn btn-success" style="text-align: right;">Add Products</a>
                     </div>
                     <div class="card-body" >
                         <div class="table-responsive"  >
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
+                                        <th>Status</th>
                                         <th>Name</th>
                                         <th>Name(Arabic)</th>
                                         <th>Image</th>
-                                        <th>Category</th>
-                                        <th>Subcategory</th>
                                         <th>Description</th>
                                         <th>Description(Arabic)</th>
                                         <th>Unit</th>
@@ -39,11 +38,10 @@
                                 </thead>
                                 <tfoot>
                                     <tr>
+                                        <th>Status</th>
                                         <th>Name</th>
                                         <th>Name(Arabic)</th>
                                         <th>Image</th>
-                                        <th>Category</th>
-                                        <th>Subcategory</th>
                                         <th>Description</th>
                                         <th>Description(Arabic)</th>
                                         <th>Unit</th>
@@ -61,6 +59,14 @@
                                     
                                     {% for product in prod %}
                                     <tr>
+                                        <td>
+                                            {% if product.status == "enable" %}
+                                                <button class="status-button" onclick='diableFuc("{{ product.id }}")' title="Click to disable" style="background-color: #22db1b; min-width: 60px;">Enabled</button>
+                                            {% else %}
+                                                <button class="status-button" onclick='enableFuc("{{ product.id }}")' title="Click to enable" style="background-color: #db1b1b; min-width: 60px;">Disabled</button>
+                                            {% endif %}
+                                            
+                                        </td>
                                         <td>{{product.product_name_en}}</td>
                                         <td>{{product.product_name_ar}}</td>
                                         <td>
@@ -72,8 +78,6 @@
                                                 {% endfor %}
                                             
                                         </td>
-                                        <td><a href="{{url_for('viewProductSubCategory', id=product.product.id, name=product.product.category_name_en)}}">{{product.product.category_name_en}}</a></td> 
-                                        <td><a href="{{url_for('viewSubcatOnlyProducts', id=product.product.id)}}">{{product.products.subcategory_name_en}}</a></td>
                                         <td>{{product.product_desc_en}}</td>
                                         <td>{{product.product_desc_ar}}</td>
                                         <td>{{product.unit_id}}</td>
@@ -106,6 +110,44 @@
     
 </div>
 
+<style>
+    .status-button{
+         background-color: #4e73df;
+         color: white;
+         border: none;
+         border-radius: 5px;
+         padding: 5px;
+         font-size: 12px;
+         box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    }
+ </style>
+ 
+ <script>
+     function enableFuc(id){
+         $.ajax({
+             url: '/changeProductStatus/enable',
+             type: 'GET',
+             data: {id: id},
+             success: function(response){
+                 console.log(response);
+                 location.reload();
+             }
+         });
+         alert("Product Enabled");
+     }
+     function diableFuc(id){
+         $.ajax({
+             url: '/changeProductStatus/disable',
+             type: 'GET',
+             data: {id: id},
+             success: function(response){
+                 console.log(response);
+                 location.reload();
+             }
+         });
+         alert("Product Disabled");
+     }
+ </script>
 
 {% endblock %}
 
