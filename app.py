@@ -28,7 +28,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -175,12 +175,18 @@ def load_user(user_id):
 
 
 @app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
+def index():
+    productCategory = ProductCategory.query.all()
+
+    return render_template('index.html', user=current_user, productCategory=productCategory)
+
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    productCategory = ProductCategory.query.all()
-
-    return render_template('dashboard.html', user=current_user, productCategory=productCategory)
+    return render_template('dashboard.html', user=current_user)
 
 
 
@@ -607,7 +613,7 @@ def login():
         if user:
             if user.password == password:
                 login_user(user)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('index'))
         return 'Invalid username or password'
     return render_template('login.html')
 

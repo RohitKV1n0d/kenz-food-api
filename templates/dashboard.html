@@ -1,282 +1,184 @@
 {% extends "base.html" %}
 
-
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h1>Dashboard</h1>
-        <p style="text-align: center;">Welcome back <b>{{ user.username }}</b></p>
-        <h3 style="text-align: center;">Select a Category:</h3>
-    </div>
-</div>
+
+<div class="container-fluid">
+
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+      <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+              class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+  </div>
+
+  <!-- Content Row -->
+  <div class="row">
+
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-primary shadow h-100 py-2">
+              <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                              Earnings (Monthly)</div>
+                          <div class="h5 mb-0 font-weight-bold text-gray-800">40,000 QR</div>
+                      </div>
+                      <div class="col-auto">
+                          <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-success shadow h-100 py-2">
+              <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                              Earnings (Annual)</div>
+                          <div class="h5 mb-0 font-weight-bold text-gray-800">215,000 QR</div>
+                      </div>
+                      <div class="col-auto">
+                          <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-info shadow h-100 py-2">
+              <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Monthly Quote
+                          </div>
+                          <div class="row no-gutters align-items-center">
+                              <div class="col-auto">
+                                  <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                              </div>
+                              <div class="col">
+                                  <div class="progress progress-sm mr-2">
+                                      <div class="progress-bar bg-info" role="progressbar"
+                                          style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+                                          aria-valuemax="100"></div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-auto">
+                          <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Pending Requests Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-warning shadow h-100 py-2">
+              <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                          <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                              Pending Requests</div>
+                          <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                      </div>
+                      <div class="col-auto">
+                          <i class="fas fa-comments fa-2x text-gray-300"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Content Row -->
+
+  <div class="row">
+
+      <!-- Area Chart -->
+      <div class="col-xl-8 col-lg-7">
+          <div class="card shadow mb-4">
+              <!-- Card Header - Dropdown -->
+              <div
+                  class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                  <div class="dropdown no-arrow">
+                      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                          aria-labelledby="dropdownMenuLink">
+                          <div class="dropdown-header">Dropdown Header:</div>
+                          <a class="dropdown-item" href="#">Action</a>
+                          <a class="dropdown-item" href="#">Another action</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                  </div>
+              </div>
+              <!-- Card Body -->
+              <div class="card-body">
+                  <div class="chart-area">
+                      <canvas id="myAreaChart"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Pie Chart -->
+      <div class="col-xl-4 col-lg-5">
+          <div class="card shadow mb-4">
+              <!-- Card Header - Dropdown -->
+              <div
+                  class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
+                  <div class="dropdown no-arrow">
+                      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                          aria-labelledby="dropdownMenuLink">
+                          <div class="dropdown-header">Dropdown Header:</div>
+                          <a class="dropdown-item" href="#">Action</a>
+                          <a class="dropdown-item" href="#">Another action</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                  </div>
+              </div>
+              <!-- Card Body -->
+              <div class="card-body">
+                  <div class="chart-pie pt-4 pb-2">
+                      <canvas id="myPieChart"></canvas>
+                  </div>
+                  <div class="mt-4 text-center small">
+                      <span class="mr-2">
+                          <i class="fas fa-circle text-primary"></i> Direct
+                      </span>
+                      <span class="mr-2">
+                          <i class="fas fa-circle text-success"></i> Food-order
+                      </span>
+                      <span class="mr-2">
+                          <i class="fas fa-circle text-info"></i> Referral
+                      </span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  </div>
 
 
-
-<div class="container">
-
-
-  {% for cat in productCategory %}
-    <div class="panel {{ cat.category_name_en }}" style="background-image:url('{{ cat.category_image_url }}')">
-        <a href="{{url_for('viewProductSubCategory', id=cat.id, name=cat.category_name_en)}}" style="color: #fff;"><h3 class="show">{{ cat.category_name_en }}</h3></a>
-    </div>
-    {% endfor %}
-
-</div>
-
-
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap&family=Montserrat:ital,wght@0,100;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500&display=swap');
-
-* {
-  box-sizing: border-box;
-}
-
-
-
-h1 {
-  font-family:  'Pacifico', cursive;
-  text-align:center; 
-}
-
-h1 span {
-  padding: 10px;
-  color: #1052a8;
-}
-
-
-#logo {
-  text-decoration: none;
-  color: #1052a8;
-}
-
-.searchForm {
-  text-align: center;
-}
-
-.search {
-  width: 250px;
-  height: 30px;
-  border-radius: 8px;
-  border-style: none;
-  background-color: rgb(243, 243, 243);
-  padding-left: 20px;
-  margin-bottom: 10px;
-}
-
-
-
-.searchBtn {
-  width: 100px;
-  height: 30px;
-  border-radius: 8px;
-  background-color:#1052a8;
-  color: #fff;
-  border-style: none;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.searchBtn:active {
-  transform: scale(0.9);  
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-  justify-content: center;
-  max-width: 1400px;
-}
-
-
-.panel {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  height: 80vh;
-  border-radius: 20px;
-  color: #fff;
-  text-shadow: 3px 3px 5px #303030;
-  flex: 0.5;
-  margin: 10px;
-  position: relative;
-  transition: flex 1s ease-in;
-  cursor: pointer;
-}
-
-
-.icons {
-  background-color: rgba(0, 0, 0, 0.514);
-  width: 100%;
-  height: 100px;
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  justify-content: space-around;
-}
-
-
-
-
-.panel h3{
-  font-size: 40px;
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.247);
-  width: 100%;
-  padding: 50px;
-  border-radius: 20px 20px 0 0;
-  margin: 0;
-  opacity: 0;
-}
-
-
-.panel.active {
-  flex: 5;
-}
-
-.show {
-  display: block;
-}
-
-.panel.active h3, svg {
-  opacity: 1;
-  transition: opacity 0.3s ease-in 1s;
-}
-
-
-@media (min-width: 480px) {
-  .container {
-    width: 90vw;
-    flex-direction: row;
-    align-items: center;
-  }
-}
-
-</style>
-
-
-<script>
-    const panels = document.querySelectorAll('.panel');
-const fruit = document.querySelector('.fruit');
-const savory = document.querySelector('.savory');
-const pizza = document.querySelector('.pizza');
-const review = document.querySelector('.review');
-const dessert = document.querySelector('.dessert');
-
-const search = document.querySelector('.search');
-
-const searchBtn = document.querySelector('.searchBtn');
-
-
-// click event panel expansion
-panels.forEach((panel) => {
-  panel.addEventListener('click', () => {
-    removeActiveClasses()
-    panel.classList.add('active')
-  });  
-});
-
-// removing activation of panel expansion
-function removeActiveClasses() {
-  panels.forEach(panel => {
-    panel.classList.remove('active');
-  });
-}
-
-//search elements
-const fruitDrink= [
-  'str',
-  'blu',
-  'water',
-  'cof',
-  'cher',
-  'kiw',
-  'hotc',
-  'mil',
-  'ju',
-  'fru',
-  'drin'
-];
-
-const sweets = [
-  'cak',
-  'brea',
-  'muff',
-  'crois',
-  'pastr',
-  'dani'
-];
-
-const savories = [
-  'pa',
-  'spag',
-  'toma',
-  'chee',
-  'garl',
-  'pota',
-  'eg',
-  'ric',
-  'avo',
-  'chic',
-  'bee',
-  'por',
-  'lam',
-  'oli'
-];
-
-const pizzas = [
-  'pepp',
-  'capp',
-  'supr',
-  'meatlo',
-  'veget',
-  'bbq',
-  'marga',
-  'marin',
-  'pizz'
-];
-
-const reviews = [
-  'rest',
-  'revi'
-];
-
-// search value matching against search menu
-const searched = (panelClass, items) => {
-  search.addEventListener('keydown', () => {
-    searchItems(panelClass, items);    
-  })  
-}
-// action upon search result
-const searchItems = (panelClass, items) => {
-  for(let i = 0; i < items.length; i++) {
-    if(search.value.includes(items[i])) {
-      removeActiveClasses()
-      panelClass.classList.add('active');
-    }    
-  }  
-}
-
-
-//prevent search button submission
-searchBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-});
-
-
-//call the searched function 
-searched(fruit, fruitDrink)
-searched(savory, savories)
-searched(dessert, sweets)
-searched(pizza, pizzas)
-searched(review, reviews)
-
-
-
-</script>
 
 {% endblock %}
-
-
 
