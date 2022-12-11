@@ -15,7 +15,7 @@
                         <a href="{{url_for('addProductSubCategory', id=id)}}" class="btn btn-success" style="text-align: right;">Add</a>
                     </div>
                     <div class="card-body" >
-                        <div class="table-responsive"  >
+                        <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
@@ -45,7 +45,7 @@
                                     
                                     {% for productCategory in prod_subcat %}
                                     <tr>
-                                        <td>{{productCategory.subcategory_name_en}}</td>
+                                        <td><a href="{{url_for('viewSubcatOnlyProducts', id=productCategory.id)}}">{{productCategory.subcategory_name_en}}</a></td>
                                         <td>{{productCategory.subcategory_name_ar}}</td>
                                         <td>{{productCategory.subcategory_order}}</td>
                                         <td><div style="text-align: center; "><img src="{{productCategory.subcategory_image_url}}" alt="{{productCategory.subcategory_image_url}}" style="max-width:100px;"></div></td>
@@ -58,8 +58,6 @@
                                         </td>
                                     </tr>
                                     {% endfor %}
-                                   
-                                    
                                 </tbody>
                             </table>
                         </div>
