@@ -174,11 +174,13 @@ def load_user(user_id):
     return Users.query.get(int(user_id))
 
 
-@app.route('/')
-@app.route('/dashboard')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
-def dashboard(methods=['GET', 'POST']):
-    return render_template('dashboard.html', user=current_user)
+def dashboard():
+    productCategory = ProductCategory.query.all()
+
+    return render_template('dashboard.html', user=current_user, productCategory=productCategory)
 
 
 
