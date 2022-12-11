@@ -216,46 +216,51 @@
     Response Body: JSON Object
     Example:
     {
-        "products": [
-            {
-                "active": null,
-                "category_id": 1,
-                "id": 1,
-                "product_desc_ar": "هذا إدخال اختبار فرعي للقطط",
-                "product_desc_en": "this is a test sub cat entrty",
-                "product_image_url": "Group_84logo.png",
-                "product_name_ar": "دخول الاختبار",
-                "product_name_en": "test_Subcat1 edit",
-                "product_order": null,
-                "subcategory_id": 1
-            },
-            {
-                "active": null,
-                "category_id": 1,
-                "id": 2,
-                "product_desc_ar": "دخول الاختباردخول الاختباردخول الاختبار",
-                "product_desc_en": "Thso os tets",
-                "product_image_url": "Group_85.png",
-                "product_name_ar": "دخول الاختبار",
-                "product_name_en": "test_Subcat2",
-                "product_order": null,
-                "subcategory_id": 1
-            },
-            {
-                "active": null,
-                "category_id": 1,
-                "id": 3,
-                "product_desc_ar": "دخول الاختباردخول الاختباردخول الاختباردخول الاختبار",
-                "product_desc_en": "this is a test 3 entry",
-                "product_image_url": "HASH_IT_LOGO.png",
-                "product_name_ar": "دخول الاختبار",
-                "product_name_en": "test_Subcat3",
-                "product_order": null,
-                "subcategory_id": 1
-            }
-        ],
-        "return": "success"
-    }
+    "products": [
+        {
+            "cat_id": 2,
+            "fast_delivery": null,
+            "featured": null,
+            "fresh": null,
+            "id": 10,
+            "offer": null,
+            "other_title_ar": null,
+            "other_title_en": null,
+            "product_barcode": null,
+            "product_cat_id": 2,
+            "product_code": null,
+            "product_desc_ar": "asdasdasd",
+            "product_desc_en": "asdasd",
+            "product_images": [
+                {
+                    "id": 42,
+                    "product_id": 10,
+                    "product_image_url": "https://i.imgur.com/rFpmw8C.jpg"
+                }
+            ],
+            "product_name_ar": "asd",
+            "product_name_en": "Test image url 1",
+            "product_stock": [
+                {
+                    "id": 24,
+                    "main_rack_no": null,
+                    "max_stock": "",
+                    "min_stock": "",
+                    "opening_stock": "",
+                    "product_id": 10,
+                    "product_offer_price": "asd",
+                    "product_price": "dasd",
+                    "product_purchase_price": "asd",
+                    "sub_rack_no": null
+                }
+            ],
+            "product_subcat_id": 2,
+            "status": null,
+            "subcat_id": 2,
+            "unit_quantity": "dasdasd"
+        }
+    ],
+    "return": "success" }
 
 
 </ul>
