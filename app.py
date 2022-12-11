@@ -28,7 +28,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -784,6 +784,21 @@ def deleteProductSubCategory(id):
 def addProduct():
     category = ProductCategory.query.all()
     subcategory = ProductSubCategory.query.all()
+
+    subcat= [[],[]]
+    opt= {}
+    with app.app_context():
+        category = ProductCategory.query.all()
+        for cat in category:
+            for sub in cat.sub_cat:
+                subcat[0].append(sub.subcategory_name_en)
+                subcat[1].append(sub.id)
+                opt[cat.id] = subcat
+            subcat= [[],[]]
+         
+          
+        
+
     if request.method == 'POST':
         try: 
             with app.app_context():
@@ -828,7 +843,7 @@ def addProduct():
             return redirect(url_for('viewProduct'))
         except Exception as e:
             return jsonify({'return': 'error adding product :- '+str(e)})
-    return render_template('addProduct.html', category=category, subcategory=subcategory)
+    return render_template('addProduct.html', category=category, subcategory=subcategory,otp=opt)
 
 
 
