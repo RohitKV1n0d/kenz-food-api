@@ -72,8 +72,8 @@
                                                 {% endfor %}
                                             
                                         </td>
-                                        <td>{{product.product.category_name_en}}</td> 
-                                        <td>{{product.products.subcategory_name_en}}</td>
+                                        <td><a href="{{url_for('viewProductSubCategory', id=product.product.id, name=product.product.category_name_en)}}">{{product.product.category_name_en}}</a></td> 
+                                        <td><a href="{{url_for('viewSubcatOnlyProducts', id=product.product.id)}}">{{product.products.subcategory_name_en}}</a></td>
                                         <td>{{product.product_desc_en}}</td>
                                         <td>{{product.product_desc_ar}}</td>
                                         <td>{{product.unit_id}}</td>
