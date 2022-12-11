@@ -382,6 +382,7 @@ def get_product():
                 if get_products:
                     products_json = []
                     products_stocks_json = []
+                    products_images_json = []
                     for product in get_products: 
                         product_json = {
                             'id': product.id,
@@ -404,6 +405,7 @@ def get_product():
                             'cat_id': product.cat,
                             'subcat_id': product.subcat,
                             'product_stock': [],
+                            'product_images': []
                             # 'product_price': product.product_stock,
                         }
                         for product_stock in product.product_stock:
@@ -421,7 +423,16 @@ def get_product():
                             }
                             products_stocks_json.append(product_stock_json)
                             product_json['product_stock'] = products_stocks_json
+                        for product_image in product.product_image:
+                            product_image_json = {
+                                'id': product_image.id,
+                                'product_image_url': product_image.product_image_url,
+                                'product_id': product_image.fk_product_id,
+                            }
+                            products_images_json.append(product_image_json)
+                            product_json['product_images'] = products_images_json
 
+                        products_images_json = []
                         products_stocks_json = []
                         products_json.append(product_json)
                     return jsonify({'return': 'success', 'products': products_json})
