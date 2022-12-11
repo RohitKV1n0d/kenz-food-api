@@ -28,7 +28,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -572,6 +572,25 @@ def get_product():
                 return jsonify({'return': 'error getting products : '+ str(e)})
 
 
+@app.route('/changeProductStatus/<status>')
+def changeProductStatus(status):
+    if request.method == 'GET':
+        try:
+            get_product = Products.query.filter_by(id=request.args.get('id')).first()
+            if get_product:
+                if status == 'check':
+                    return jsonify({'return': 'success', 'status': get_product.status})
+                else:
+                    get_product.status = status
+                    db.session.commit()
+                    return jsonify({'return': 'success', 'message': 'product status changed'})
+            else:
+                return jsonify({'return': 'error', 'message': 'product not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error changing product status : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
 
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
@@ -915,9 +934,7 @@ def addProduct():
                             category=category, 
                             subcategory=subcategory,
                             otp=opt)
-                            # subcat_id=subcat_id, 
-                            # addCat=addCat,
-                            # addSubcat=addSubcat)
+                            
 
 
 
