@@ -28,7 +28,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -779,11 +779,77 @@ def deleteProductSubCategory(id):
 
                                             #-----Porduct sub category-----#
 
+@app.route('/addProductWithSubcat/<subcat_id>', methods=['POST', 'GET'])
+@login_required
+def addProductWithSubcat(subcat_id):
+    category = ProductCategory.query.all()
+    subcategory = ProductSubCategory.query.all()
+
+    addSubcat = ProductSubCategory.query.get_or_404(subcat_id)
+    addCat = ProductCategory.query.get_or_404(addSubcat.fk_prod_cat_id)
+
+          
+        
+
+    if request.method == 'POST':
+        try: 
+            with app.app_context():
+        
+                prod = Products(
+                    product_name_en=request.form['product_name_en'], 
+                    product_name_ar=request.form['product_name_ar'],
+                    product_desc_en=request.form['product_desc_en'],
+                    product_desc_ar=request.form['product_desc_ar'],
+                    unit_id=request.form['unit'],
+                    unit_quantity=request.form['unit_quantity'],
+                    cat=addCat.id,
+                    subcat=addSubcat.id
+                )
+                db.session.add(prod)
+                db.session.commit()
+                prod_img = request.files.getlist('product_image_url')
+                for img in prod_img:
+                    img_filename = secure_filename(img.filename)
+                    basedir = os.path.abspath(os.path.dirname(__file__))
+                    img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                    upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                    prod_img = ProductImages(fk_product_id=prod.id,
+                        product_image_url=upload_image.link
+                    )
+                    db.session.add(prod_img)
+                    db.session.commit()
+                    os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+
+                prod_stock = ProductStock(fk_product_id=prod.id,
+                        product_price=request.form['product_price'],
+                        product_offer_price=request.form['product_offer_price'],
+                        product_purchase_price=request.form['product_purchase_price'],
+                        opening_stock=request.form['opening_stock'],
+                        min_stock=request.form['min_stock'],
+                        max_stock=request.form['max_stock']
+                )
+                db.session.add(prod_stock)
+                db.session.commit()
+
+
+            return redirect(url_for('viewSubcatOnlyProducts', id=addSubcat.id))
+        except Exception as e:
+            return jsonify({'return': 'error adding product :- '+str(e)})
+    return render_template('addProductWithSubcat.html', 
+                            category=category, 
+                            subcategory=subcategory,
+                            subcat_id=subcat_id, 
+                            addCat=addCat,
+                            addSubcat=addSubcat)
+
 @app.route('/addProduct', methods=['POST', 'GET'])
 @login_required
 def addProduct():
     category = ProductCategory.query.all()
     subcategory = ProductSubCategory.query.all()
+
+    # addSubcat = ProductSubCategory.query.get_or_404(subcat_id)
+    # addCat = ProductCategory.query.get_or_404(addSubcat.fk_prod_cat_id)
 
     subcat= [[],[]]
     opt= {}
@@ -843,7 +909,13 @@ def addProduct():
             return redirect(url_for('viewProduct'))
         except Exception as e:
             return jsonify({'return': 'error adding product :- '+str(e)})
-    return render_template('addProduct.html', category=category, subcategory=subcategory,otp=opt)
+    return render_template('addProduct.html', 
+                            category=category, 
+                            subcategory=subcategory,
+                            otp=opt)
+                            # subcat_id=subcat_id, 
+                            # addCat=addCat,
+                            # addSubcat=addSubcat)
 
 
 
@@ -917,3 +989,11 @@ def deleteProduct(id):
         return jsonify({'return': 'error deleting product :- '+str(e)})
 
 
+@app.route('/viewSubcatOnlyProducts/<id>', methods=['GET', 'POST'])
+@login_required
+def viewSubcatOnlyProducts(id):
+    prod = Products.query.filter_by(subcat=id).all()
+    sub_cat = ProductSubCategory.query.get_or_404(id)
+    prod_img = ProductImages.query.all()
+    prod_stock = ProductStock.query.all()
+    return render_template('viewSubcatOnlyProducts.html', prod=prod, prod_img=prod_img,zip=zip, prod_stock=prod_stock, sub_cat=sub_cat)
