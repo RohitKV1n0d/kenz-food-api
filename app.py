@@ -216,6 +216,44 @@ def insert_users():
             return jsonify({'return': 'error adding user'+str(e)})
     return jsonify({'return': 'no POST request'})
 
+@app.route('/sign_in', methods=['POST'])
+def sign_in():
+    if request.method == 'POST':
+        content = request.json
+        # print(content)
+        try: 
+            with app.app_context():
+                user = Users.query.filter_by(email=content['email']).first()
+                if user:
+                    if user.password == content['password']:
+                        login_user(user)
+                        return jsonify({
+                                        'return': 'success', 
+                                        'user': user.username,
+                                        'email': user.email,
+                                        'phone': user.phone,
+                                        # 'password': user.password,
+                                        'firstname': user.firstname,
+                                        'lastname': user.lastname,
+                                        'user_type': user.user_type,
+                                        'ip_address': user.ip_address,
+                                        'profile_url': user.profile_url,
+                                        'verified_user': user.verified_user,
+                                        'active_user': user.active_user,
+                                        'created_at': user.created_at,
+                                        'last_login': user.last_login,
+                                        'fcm_id': user.fcm_id,
+                                        'latitude': user.latitude,
+                                        'longitude': user.longitude
+                                        })
+                    else:
+                        return jsonify({'return': 'wrong password'})
+                else:
+                    return jsonify({'return': 'user not found'})
+        except Exception as e:
+            return jsonify({'return': 'error signing in'+str(e)})
+    return jsonify({'return': 'no POST request'})
+
 @app.route('/get_users/<parm>', methods=['GET'])
 def get_users(parm):
     
