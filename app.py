@@ -256,7 +256,7 @@ def sign_in():
 
 @app.route('/get_users/<parm>', methods=['GET'])
 def get_users(parm):
-    
+
 
     def get_USER_query(user):
         user_json = {
@@ -280,26 +280,36 @@ def get_users(parm):
                     }
         return user_json
 
+    #check user 
 
 
     if request.method == 'GET': 
         try:    
             if parm == 'email':
                 email = request.args.get('email')
-                user = Users.query.filter_by(email=email).first()
-                return jsonify(get_USER_query(user))
+                try:
+                    user = Users.query.filter_by(email=email).first()
+                    return jsonify(get_USER_query(user))
+                except Exception as e:
+                    return jsonify({'return': 'no user found'})
 
             elif parm == 'username':
                 username = request.args.get('username')
-                user = Users.query.filter_by(username=username).first()
-                return jsonify(get_USER_query(user))
+                try:
+                    user = Users.query.filter_by(username=username).first()
+                    return jsonify(get_USER_query(user))
+                except Exception as e:
+                    return jsonify({'return': 'no user found'})
             
             elif parm == 'phone':
                 phone = request.args.get('phone')
-                user = Users.query.filter_by(phone=phone).first()
-                return jsonify(get_USER_query(user))
+                try:
+                    user = Users.query.filter_by(phone=phone).first()
+                    return jsonify(get_USER_query(user))
+                except Exception as e:
+                    return jsonify({'return': 'no user found'})
             else:
-                return jsonify({'return': 'no user found'})
+                return jsonify({'return': 'no such parameter'})
         except Exception as e:
             return jsonify({'return': 'error getting users : '+ str(e)})
     return jsonify({'return': 'no GET request'})
