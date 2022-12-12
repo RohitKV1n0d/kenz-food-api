@@ -6,7 +6,7 @@
 <h3>Insert User</h3>
 <ul>
     <p>Insert a new user into the database</p>
-    <p>URL: /inster_users</p>
+    <p>URL: /insert_users</p>
     <p>Method: POST</p>
     <p>URL Content-Type: JSON</p>
     
@@ -23,6 +23,42 @@
             "phone" :  "1234567890"
         }
       
+</ul>
+
+
+<h3>Sign In User</h3>
+<ul>
+    <p>Sign in a user by passing email and password</p>
+    <p>URL: /sign_in</p>
+    <p>Method: POST</p>
+    <p>URL Content-Type: JSON</p>
+    
+       
+        Example Input body:
+        {
+            "email" : "rohitvinod92@gmail.com",
+            "password" : "rkv123"
+        }
+
+        Example Response body:
+        {
+            "active_user": null,
+            "created_at": null,
+            "email": "rohitvinod92@gmail.com",
+            "fcm_id": null,
+            "firstname": "rohit",
+            "ip_address": "0.0.0.0",
+            "last_login": null,
+            "lastname": "vinod",
+            "latitude": null,
+            "longitude": null,
+            "phone": "1234567890",
+            "profile_url": null,
+            "return": "success",
+            "user": "rohit123",
+            "user_type": "user",
+            "verified_user": null
+        }
 </ul>
 
         
