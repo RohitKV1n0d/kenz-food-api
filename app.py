@@ -28,7 +28,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -63,8 +63,8 @@ class Users(db.Model, UserMixin):
     firstname = db.Column(db.String(100), nullable=False)
     lastname = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    phone = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    phone = db.Column(db.String(100), nullable=False, unique=True)
     profile_url = db.Column(db.String(100), nullable=True)
     verified_user = db.Column(db.String(100), nullable=True)
     active_user = db.Column(db.String(100), nullable=True)
@@ -163,6 +163,107 @@ class ProductStock(db.Model):
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
+class ProductUnit(db.Model):
+    __tablename__ = 'productunit'
+    id = db.Column(db.Integer, primary_key=True)
+    unit_name_en = db.Column(db.String(100), nullable=False)
+    unit_name_ar = db.Column(db.String(100), nullable=True)
+    unit_desc_en = db.Column(db.String(100), nullable=True)
+    unit_desc_ar = db.Column(db.String(100), nullable=True)
+    unit_short_form_en = db.Column(db.String(100), nullable=True)
+    unit_short_form_ar = db.Column(db.String(100), nullable=True)
+    active = db.Column(db.String(100), nullable=True)
+
+    unit_product = db.relationship('Products', backref='unit_product')
+
+
+class User_type(db.Model):
+    __tablename__ = 'usertype'
+    id = db.Column(db.Integer, primary_key=True)
+    user_type = db.Column(db.String(100))
+    user_name = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+
+    user_type = db.relationship('Users', backref='user_type')
+
+
+class User_address(db.Model):
+    __tablename__ = 'useraddress'
+    id = db.Column(db.Integer, primary_key=True)
+    address_line1 = db.Column(db.String(100), nullable=True)
+    address_line2 = db.Column(db.String(100), nullable=True)
+    city = db.Column(db.String(100), nullable=True)
+    postal_code = db.Column(db.String(100), nullable=True)
+    country = db.Column(db.String(100), nullable=True)
+    telephone = db.Column(db.String(100), nullable=True)
+    mobile = db.Column(db.String(100), nullable=True)
+    latitude = db.Column(db.String(100), nullable=True)
+    longitude = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class User_whishlist(db.Model):
+    __tablename__ = 'userwhishlist'
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+class Cart_item(db.Model):
+    __tablename__ = 'cartitem'
+    id = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+class Order_item(db.Model):
+    __tablename__ = 'orderitem'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(100), nullable=True)
+    quantity = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    order_details = db.relationship('Order_details', backref='order_details')
+
+
+class Order_details(db.Model):
+    __tablename__ = 'orderdetails'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(100), nullable=True)
+    order_date = db.Column(db.DateTime, nullable=True)
+    order_status = db.Column(db.String(100), nullable=True)
+    order_total = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    fk_order_id = db.Column(db.Integer, db.ForeignKey('orderitem.id'))
+    
+class payment_details(db.Model):
+    __tablename__ = 'paymentdetails'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(100), nullable=True)
+    payment_id = db.Column(db.String(100), nullable=True)
+    payment_type = db.Column(db.String(100), nullable=True)
+    payment_status = db.Column(db.String(100), nullable=True)
+    payment_amount = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    fk_order_id = db.Column(db.Integer, db.ForeignKey('orderitem.id'))
 
 
 login_manager = LoginManager()
@@ -645,7 +746,26 @@ def changeProductStatus(status):
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
-
+# @app.route('/addToCart/<status>')
+# def addToCart(status):
+#     if request.method == 'GET':
+#         try:
+#             get_product = Products.query.filter_by(id=request.args.get('id')).first()
+#             if get_product:
+#                 if status == 'check':
+#                     return jsonify({'return': 'success', 'status': get_product.status})
+#                 else:
+#                     get_product.status = status
+#                     db.session.commit()
+#                     return jsonify({'return': 'success', 'message': 'product status changed'})
+#             else:
+#                 return jsonify({'return': 'error', 'message': 'product not found'})
+#         except Exception as e:
+#             return jsonify({'return': 'error', 'message': 'error changing product status : '+ str(e)})
+#     else:
+#         return jsonify({'return': 'error', 'message': 'method not allowed'})
+    
+    
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
 
