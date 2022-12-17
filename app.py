@@ -923,7 +923,7 @@ def login():
         password = request.form['password']
         user = Users.query.filter_by(username=username).first()
         if user:
-            if user.password == password:
+            if check_password_hash(user.password, password):
                 login_user(user)
                 return redirect(url_for('index'))
         return 'Invalid username or password'
