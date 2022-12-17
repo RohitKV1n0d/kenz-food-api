@@ -104,6 +104,60 @@
 
 </ul>
 
+<h3>Add User Address</h3>
+<ul>
+    <p>Add a new address for a user</p>
+    <p>URL: /user_addr</p>
+    <p>Method: POST</p>
+    <p>URL Content-Type: JSON</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr</p>
+    
+       
+        Example Input body:
+        {
+            'id': item.id,
+            'address_line1': item.address_line1,
+            'address_line2': item.address_line2,
+            'city': item.city,
+            'postal_code': item.postal_code,
+            'country': item.country,
+            'telephone': item.telephone,
+            'mobile': item.mobile,
+            'latitude': item.latitude,
+            'longitude': item.longitude,
+            'created_at': item.created_at,
+            'modified_at': item.modified_at,
+            'user_id': item.user_id
+        }
+</ul>
+
+<h3>Get User Address</h3>
+<ul>
+    <p>Get all address for a user</p>
+    <p>URL: /user_addr</p>
+    <p>Method: GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr</p>
+    
+       
+        Example Input body:
+        {
+            'id': item.id,
+            'address_line1': item.address_line1,
+            'address_line2': item.address_line2,
+            'city': item.city,
+            'postal_code': item.postal_code,
+            'country': item.country,
+            'telephone': item.telephone,
+            'mobile': item.mobile,
+            'latitude': item.latitude,
+            'longitude': item.longitude,
+            'created_at': item.created_at,
+            'modified_at': item.modified_at,
+            'user_id': item.user_id
+        }
+</ul>
+
+
 
 <h2>Banner API</h2>
 
