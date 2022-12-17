@@ -49,6 +49,12 @@
                     <span>Dashboard</span></a>
             </li>
 
+            <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('addBanner')}}">
+                    <i class="fas fa-fw fa"></i>
+                    <span>Add Banner</span></a>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -88,6 +94,7 @@
                         <h6 class="collapse-header">Categories Actions:</h6>
                         <a class="collapse-item" href="{{url_for('addProductCategory', subcat_id=0)}}">Add Categories</a>
                         <a class="collapse-item" href="{{url_for('viewProductCategory')}}">View Categories</a>
+                        
                         
                     </div>
                 </div>
