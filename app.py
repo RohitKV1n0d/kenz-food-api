@@ -406,7 +406,7 @@ def insert_users():
 #             return jsonify({'return': 'error signing in'+str(e)})
 #     return jsonify({'return': 'no POST request'})
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
     
     if request.method == 'POST':
