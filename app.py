@@ -933,6 +933,7 @@ def deleteCartItem(jwt_current_user, product_id):
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
             if get_cart:
+                get_cart.modified_at = datetime.datetime.now()
                 db.session.delete(get_cart)
                 db.session.commit()
                 return jsonify({'return': 'success', 'message': 'cart item deleted'})
@@ -970,6 +971,7 @@ def incQty(jwt_current_user, product_id):
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
             if get_cart:
                 get_cart.quantity = int(get_cart.quantity) + 1
+                get_cart.modified_at = datetime.datetime.now()
                 db.session.commit()
                 return jsonify({'return': 'success', 'message': 'quantity increased'})
             else:
@@ -989,6 +991,7 @@ def decQty(jwt_current_user, product_id):
             if get_cart:
                 if int(get_cart.quantity) > 1:
                     get_cart.quantity = int(get_cart.quantity) - 1
+                    get_cart.modified_at = datetime.datetime.now()
                     db.session.commit()
                     return jsonify({'return': 'success', 'message': 'quantity decreased'})
                 else:
@@ -999,6 +1002,132 @@ def decQty(jwt_current_user, product_id):
             return jsonify({'return': 'error', 'message': 'error decreasing quantity : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/wishlist/<product_id>', methods=['POST'])
+@token_required
+def addWishlist(jwt_current_user, product_id):
+    if request.method == 'POST':
+        try:
+            get_wishlist = UserWhishlist.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            if get_wishlist:
+                return jsonify({'return': 'error', 'message': 'product already in wishlist'})
+            else:
+                new_wishlist = UserWhishlist(fk_user_id=jwt_current_user.id, fk_product_id=product_id, created_at=datetime.datetime.now(), modified_at=datetime.datetime.now())
+                db.session.add(new_wishlist)
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'product added to wishlist'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error adding product to wishlist : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+@app.route('/wishlist', methods=['GET'])
+@token_required
+def getWishlist(jwt_current_user):
+    if request.method == 'GET':
+        try:
+            get_wishlist = UserWhishlist.query.filter_by(fk_user_id=jwt_current_user.id).all()
+            if get_wishlist:
+                wishlist = []
+                products_stocks_json = []
+                products_images_json = []
+                for item in get_wishlist:
+                    # get_product = Products.query.filter_by(id=item.fk_product_id).first()
+                    get_product_stocks = ProductStock.query.filter_by(fk_product_id=item.fk_product_id).all()
+                    for product_stock in get_product_stocks:
+                        product_stock_json = {
+                            'id': product_stock.id,
+                            'product_price': product_stock.product_price,
+                            'product_offer_price': product_stock.product_offer_price,
+                            'product_purchase_price': product_stock.product_purchase_price,
+                            'opening_stock': product_stock.opening_stock,
+                            'min_stock': product_stock.min_stock,
+                            'max_stock': product_stock.max_stock,
+                            'main_rack_no': product_stock.main_rack_no,
+                            'sub_rack_no': product_stock.sub_rack_no,
+                            'product_id': product_stock.fk_product_id,
+                        }
+                        products_stocks_json.append(product_stock_json)
+                    get_product_images = ProductImages.query.filter_by(fk_product_id=item.fk_product_id).all()
+                    for product_image in get_product_images:
+                        product_image_json = {
+                            'id': product_image.id,
+                            'product_image_url': product_image.product_image_url,
+                            'product_id': product_image.fk_product_id,
+                        }
+                        products_images_json.append(product_image_json)
+                    wishlist.append({
+                        'id': item.id,
+                        'user_id': item.fk_user_id,
+                        'product_id': item.fk_product_id,
+                        'product_name_en': item.user_whishlist.product_name_en,
+                        'product_name_ar': item.user_whishlist.product_name_ar,
+                        'product_desc_en': item.user_whishlist.product_desc_en,
+                        'product_desc_ar': item.user_whishlist.product_desc_ar,
+                        'unit_quantity': item.user_whishlist.unit_quantity,
+                        'product_code': item.user_whishlist.product_code,
+                        'product_barcode': item.user_whishlist.produc_barcode,
+                        'other_title_en': item.user_whishlist.other_title_en,
+                        'other_title_ar': item.user_whishlist.other_title_ar, 
+                        'status': item.user_whishlist.status,
+                        'fast_delivery': item.user_whishlist.fast_delivery,
+                        'featured': item.user_whishlist.featured,
+                        'fresh': item.user_whishlist.fresh,
+                        'offer': item.user_whishlist.offer,
+                        'product_cat_id': item.user_whishlist.cat,
+                        'product_subcat_id': item.user_whishlist.subcat,
+                        'cat_id': item.user_whishlist.cat,
+                        'subcat_id': item.user_whishlist.subcat,
+                        'product_stock': product_stock_json,
+                        'product_images': products_images_json,
+                        'created_at': item.created_at,
+                        'modified_at': item.modified_at
+                    })
+                return jsonify({'return': 'success', 'message': 'wishlist fetched', 'data': wishlist})
+            else:
+                return jsonify({'return': 'error', 'message': 'wishlist is empty'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching wishlist : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/wishlist/<product_id>', methods=['DELETE'])
+@token_required
+def deleteWishlist(jwt_current_user, product_id):
+    if request.method == 'DELETE':
+        try:
+            get_wishlist = UserWhishlist.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            if get_wishlist:
+                db.session.delete(get_wishlist)
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'product removed from wishlist'})
+            else:
+                return jsonify({'return': 'error', 'message': 'product not found in wishlist'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error removing product from wishlist : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+@app.route('/wishlist/clear', methods=['DELETE'])
+@token_required
+def clearWishlist(jwt_current_user):
+    if request.method == 'DELETE':
+        try:
+            get_wishlist = UserWhishlist.query.filter_by(fk_user_id=jwt_current_user.id).all()
+            if get_wishlist:
+                for item in get_wishlist:
+                    db.session.delete(item)
+                    db.session.commit()
+                return jsonify({'return': 'success', 'message': 'wishlist cleared'})
+            else:
+                return jsonify({'return': 'error', 'message': 'wishlist is empty'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error clearing wishlist : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
 
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##

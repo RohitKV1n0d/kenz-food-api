@@ -513,6 +513,136 @@
     }
 </ul>   
 
+<h2>Wishlist APIs</h2>
+
+<h3>Add to Wishlist</h3>
+<ul>
+    <p>Add a product to wishlist</p>
+    <p>URL: /wishlist/{product_id}</p>
+    <p>Method : POST</p>
+    <p>Parameters : product_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/wishlist/1</p>
+
+    Request Body: JSON Object
+    Example :
+    {
+        "message": "product added to wishlist",
+        "return": "success"
+    }
+
+    Response Body: JSON Object
+    Example (If product is already in wishlist):
+    {
+        "message": "product already in wishlist",
+        "return": "success"
+    }
+</ul>
+
+<h3>Get all Wishlist items</h3>
+<ul>
+    <p>Get all items in wishlist</p>
+    <p>URL: /wishlist</p>
+    <p>Method : GET</p>
+    <p>Parameters : </p>
+    <p>Example : http://kenz-food-api.herokuapp.com/wishlist</p>
+
+    Response Body: JSON Object
+    Example Output:
+    {
+        "data": [
+            {
+                "cat_id": 1,
+                "created_at": "Sun, 18 Dec 2022 04:05:54 GMT",
+                "fast_delivery": null,
+                "featured": null,
+                "fresh": null,
+                "id": 1,
+                "modified_at": "Sun, 18 Dec 2022 04:05:54 GMT",
+                "offer": null,
+                "other_title_ar": null,
+                "other_title_en": null,
+                "product_barcode": null,
+                "product_cat_id": 1,
+                "product_code": null,
+                "product_desc_ar": "veg briyani 1veg briyani 1veg briyani 1veg briyani 1veg briyani 1veg briyani 1",
+                "product_desc_en": "veg briyani 1veg briyani 1ac",
+                "product_id": 1,
+                "product_images": [
+                    {
+                        "id": 1,
+                        "product_id": 1,
+                        "product_image_url": "https://i.imgur.com/Ptusp9y.jpg"
+                    },
+                    {
+                        "id": 2,
+                        "product_id": 1,
+                        "product_image_url": "https://i.imgur.com/q8PDpAp.jpg"
+                    },
+                    {
+                        "id": 3,
+                        "product_id": 1,
+                        "product_image_url": "https://i.imgur.com/PRIIs60.jpg"
+                    }
+                ],
+                "product_name_ar": "veg briyani 1",
+                "product_name_en": "veg briyani 1",
+                "product_stock": {
+                    "id": 1,
+                    "main_rack_no": null,
+                    "max_stock": "3",
+                    "min_stock": "12312",
+                    "opening_stock": "123",
+                    "product_id": 1,
+                    "product_offer_price": "123",
+                    "product_price": "123",
+                    "product_purchase_price": "123",
+                    "sub_rack_no": null
+                },
+                "product_subcat_id": 1,
+                "status": "enable",
+                "subcat_id": 1,
+                "unit_quantity": "2",
+                "user_id": 1
+            }
+        ],
+        "message": "wishlist fetched",
+        "return": "success"
+    }
+</ul>
+
+<h3>Delete Wishlist item</h3>
+<ul>
+    <p>Delete a specific item in the wishlist with product id</p>
+    <p>URL: /wishlist/{product_id}</p>
+    <p>Method : DELETE</p>
+    <p>Parameters : product_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/wishlist/2</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "product removed from wishlist",
+        "return": "success"
+    }
+</ul>
+
+<h3>Clear wishlist</h3>
+<ul>
+    <p>Clear all items in wishlist</p>
+    <p>URL: /wishlist/clear</p>
+    <p>Method : DELETE</p>
+    <p>Parameters : </p>
+    <p>Example : http://kenz-food-api.herokuapp.com/wishlist/clear</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "wishlist cleared",
+        "return": "success"
+    }
+</ul>
+
+
 
 
     
