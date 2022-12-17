@@ -513,6 +513,68 @@ def get_users(jwt_current_user, parm):
             return jsonify({'return': 'error getting users : '+ str(e)})
     return jsonify({'return': 'no GET request'})
 
+
+@app.route('/user_addr', methods=['POST'])
+@token_required
+def user_addr(jwt_current_user):
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            user_addr = UserAddress(
+                address_line1=data['address_line1'],
+                address_line2=data['address_line2'],
+                city=data['city'],
+                postal_code=data['postal_code'],
+                country=data['country'],
+                telephone=data['telephone'],
+                mobile=data['mobile'],
+                latitude=data['latitude'],
+                longitude=data['longitude'],
+                created_at=datetime.datetime.now(),
+                modified_at=datetime.datetime.now(),
+                user_id=jwt_current_user.id
+            )
+            db.session.add(user_addr)
+            db.session.commit()
+            return jsonify({'return': 'success', 'message': 'address added'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error adding address : '+ str(e)})
+    return jsonify({'return': 'no POST request'})
+
+
+@app.route('/user_addr', methods=['GET'])
+@token_required
+def get_user_addr(jwt_current_user):
+    if request.method == 'GET':
+        try:
+            user_addr = UserAddress.query.filter_by(user_id=jwt_current_user.id).all()
+            if user_addr:
+                user_addr_list = []
+                for item in user_addr:
+                    user_addr_list.append({
+                        'id': item.id,
+                        'address_line1': item.address_line1,
+                        'address_line2': item.address_line2,
+                        'city': item.city,
+                        'postal_code': item.postal_code,
+                        'country': item.country,
+                        'telephone': item.telephone,
+                        'mobile': item.mobile,
+                        'latitude': item.latitude,
+                        'longitude': item.longitude,
+                        'created_at': item.created_at,
+                        'modified_at': item.modified_at,
+                        'user_id': item.user_id
+                    })
+                return jsonify({'return': 'success', 'message': 'address fetched', 'data': user_addr_list})
+            else:
+                return jsonify({'return': 'error', 'message': 'address not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching address : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+
+
+
 @app.route('/banner', methods=['GET'])
 def banner():
     if request.method == 'GET':
