@@ -1,5 +1,5 @@
 #flask boilerpalte
-from flask import Flask, request, jsonify, render_template, url_for ,redirect, session
+from flask import Flask, request, jsonify, render_template, url_for ,redirect, session, make_response
 #sql
 from flask_sqlalchemy import SQLAlchemy
 
@@ -7,18 +7,26 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 #migration
 from flask_migrate import Migrate
 import os
-
+import jwt
 
 from werkzeug.utils import secure_filename
 import requests, json
 import pyimgur
+import jwt 
 
+import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
+
+import datetime
+
+from functools import wraps
 
 
 
 
 app = Flask(__name__)
-app.secret_key = 'asdasdasdasdasdasdasaasdasdasdasd12312312daveqvq34c'
+# app.secret_key = 'asdasdasdasdasdasdasaasdasdasdasd12312312daveqvq34c'
+app.config['SECRET_KEY'] = 'asdasdasdasdasdasdasaasdasdasdasd12312312daveqvq34c'
 
 UPLOAD_FOLDER = 'static/img/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -58,13 +66,14 @@ class Users(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     ip_address = db.Column(db.String(100))
+    public_id = db.Column(db.String(100), unique=True)
     user_type = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(100), nullable=False)    
     firstname = db.Column(db.String(100), nullable=False)
     lastname = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    phone = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    phone = db.Column(db.String(100), nullable=False, unique=True)
     profile_url = db.Column(db.String(100), nullable=True)
     verified_user = db.Column(db.String(100), nullable=True)
     active_user = db.Column(db.String(100), nullable=True)
@@ -73,8 +82,16 @@ class Users(db.Model, UserMixin):
     fcm_id = db.Column(db.String(100), nullable=True)
     latitude = db.Column(db.String(100), nullable=True)
     longitude = db.Column(db.String(100), nullable=True)
+    # session_id = db.Column(db.String(100), nullable=True)
 
     # prod_cat = db.relationship('ProductCategory', backref='prod_cat')
+    user_type_db = db.relationship('UserType', backref='user_type_db')
+    user_address = db.relationship('UserAddress', backref='user_address')
+    user_whishlist_br = db.relationship('UserWhishlist', backref='user_whishlist_br')
+    user_cart_br = db.relationship('CartItem', backref='user_cart_br')
+    order_item_br = db.relationship('OrderItem', backref='order_item_br')
+    order_details_br = db.relationship('OrderDetails', backref='order_details_br')
+    payment_details_br = db.relationship('PaymentDetails', backref='payment_details_br')
 
 
 class ProductCategory(db.Model):
@@ -89,9 +106,9 @@ class ProductCategory(db.Model):
     active = db.Column(db.String(100), nullable=True)
 
     cat_product = db.relationship('Products', backref='product')
+
     sub_cat = db.relationship('ProductSubCategory', backref='sub_cat')
     # fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
 
 class ProductSubCategory(db.Model):
     __tablename__ = 'productsubcategory'
@@ -106,6 +123,7 @@ class ProductSubCategory(db.Model):
 
     # fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     sub_product = db.relationship('Products', backref='products')
+    
     fk_prod_cat_id = db.Column(db.Integer, db.ForeignKey('productcategory.id'))
 
 
@@ -132,6 +150,13 @@ class Products(db.Model):
 
     cat = db.Column(db.Integer, db.ForeignKey('productcategory.id'))
     subcat = db.Column(db.Integer, db.ForeignKey('productsubcategory.id'))
+
+    user_whishlist = db.relationship('UserWhishlist', backref='user_whishlist')
+    cart_item = db.relationship('CartItem', backref='cart_item')
+    order_item = db.relationship('OrderItem', backref='order_item')
+    order_details = db.relationship('OrderDetails', backref='order_details')
+    payment_details = db.relationship('PaymentDetails', backref='payment_details')
+    
 
     product_image = db.relationship('ProductImages', backref='product_image')
     product_stock = db.relationship('ProductStock', backref='product_stock')
@@ -161,6 +186,131 @@ class ProductStock(db.Model):
 
 
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+
+class ProductUnit(db.Model):
+    __tablename__ = 'productunit'
+    id = db.Column(db.Integer, primary_key=True)
+    unit_name_en = db.Column(db.String(100), nullable=False)
+    unit_name_ar = db.Column(db.String(100), nullable=True)
+    unit_desc_en = db.Column(db.String(100), nullable=True)
+    unit_desc_ar = db.Column(db.String(100), nullable=True)
+    unit_short_form_en = db.Column(db.String(100), nullable=True)
+    unit_short_form_ar = db.Column(db.String(100), nullable=True)
+    active = db.Column(db.String(100), nullable=True)
+
+
+class UserType(db.Model):
+    __tablename__ = 'usertype'
+    id = db.Column(db.Integer, primary_key=True)
+    user_type = db.Column(db.String(100))
+    user_name = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
+
+
+class UserAddress(db.Model):
+    __tablename__ = 'useraddress'
+    id = db.Column(db.Integer, primary_key=True)
+    address_line1 = db.Column(db.String(100), nullable=True)
+    address_line2 = db.Column(db.String(100), nullable=True)
+    city = db.Column(db.String(100), nullable=True)
+    postal_code = db.Column(db.String(100), nullable=True)
+    country = db.Column(db.String(100), nullable=True)
+    telephone = db.Column(db.String(100), nullable=True)
+    mobile = db.Column(db.String(100), nullable=True)
+    latitude = db.Column(db.String(100), nullable=True)
+    longitude = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class UserWhishlist(db.Model):
+    __tablename__ = 'userwhishlist'
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+class CartItem(db.Model):
+    __tablename__ = 'cartitem'
+    id = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+class OrderItem(db.Model):
+    __tablename__ = 'orderitem'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    order_details_oi = db.relationship('OrderDetails', backref='order_details_oi')
+    # payment_details = db.relationship('PaymentDetails', backref='payment_details')
+
+
+class OrderDetails(db.Model):
+    __tablename__ = 'orderdetails'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(100), nullable=True)
+    order_date = db.Column(db.DateTime, nullable=True)
+    order_status = db.Column(db.String(100), nullable=True)
+    order_total = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    fk_order_id = db.Column(db.Integer, db.ForeignKey('orderitem.id'))
+    
+class PaymentDetails(db.Model):
+    __tablename__ = 'paymentdetails'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(100), nullable=True)
+    payment_id = db.Column(db.String(100), nullable=True)
+    payment_type = db.Column(db.String(100), nullable=True)
+    payment_status = db.Column(db.String(100), nullable=True)
+    payment_amount = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    modified_at = db.Column(db.DateTime, nullable=True)
+
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    fk_order_id = db.Column(db.Integer, db.ForeignKey('orderitem.id'))
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            jwt_current_user = Users.query.filter_by(id=data['public_id']).first()
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 401
+
+        return f(jwt_current_user, *args, **kwargs)
+
+    return decorated
+
+
 
 
 
@@ -202,10 +352,11 @@ def insert_users():
             with app.app_context():
                 user = Users(ip_address=content['ip_address'], 
                     user_type=content['user_type'],
+                    public_id=str(uuid.uuid4()),
                     username=content['username'],
                     firstname=content['firstname'],
                     lastname=content['lastname'],
-                    password=content['password'],
+                    password=generate_password_hash(content['password'], method='sha256'),
                     email=content['email'],
                     phone=content['phone'],
                 )
@@ -216,51 +367,114 @@ def insert_users():
             return jsonify({'return': 'error adding user'+str(e)})
     return jsonify({'return': 'no POST request'})
 
-@app.route('/sign_in', methods=['POST'])
+# @app.route('/sign_in', methods=['POST'])
+# def sign_in():
+    
+#     if request.method == 'POST':
+#         content = request.json
+#         # print(content)
+#         try: 
+#             with app.app_context():
+#                 user = Users.query.filter_by(email=content['email']).first()
+#                 if user:
+#                     if user.password == content['password']:
+#                         login_user(user)
+#                         return jsonify({
+#                                         'return': 'success', 
+#                                         'user': user.username,
+#                                         'email': user.email,
+#                                         'phone': user.phone,
+#                                         # 'password': user.password,
+#                                         'firstname': user.firstname,
+#                                         'lastname': user.lastname,
+#                                         'user_type': user.user_type,
+#                                         'ip_address': user.ip_address,
+#                                         'profile_url': user.profile_url,
+#                                         'verified_user': user.verified_user,
+#                                         'active_user': user.active_user,
+#                                         'created_at': user.created_at,
+#                                         'last_login': user.last_login,
+#                                         'fcm_id': user.fcm_id,
+#                                         'latitude': user.latitude,
+#                                         'longitude': user.longitude
+#                                         })
+#                     else:
+#                         return jsonify({'return': 'wrong password'})
+#                 else:
+#                     return jsonify({'return': 'user not found'})
+#         except Exception as e:
+#             return jsonify({'return': 'error signing in'+str(e)})
+#     return jsonify({'return': 'no POST request'})
+
+@app.route('/login', methods=['GET', 'POST'])
 def sign_in():
+    
     if request.method == 'POST':
         content = request.json
-        # print(content)
-        try: 
-            with app.app_context():
-                user = Users.query.filter_by(email=content['email']).first()
-                if user:
-                    if user.password == content['password']:
-                        login_user(user)
-                        return jsonify({
-                                        'return': 'success', 
-                                        'user': user.username,
-                                        'email': user.email,
-                                        'phone': user.phone,
-                                        # 'password': user.password,
-                                        'firstname': user.firstname,
-                                        'lastname': user.lastname,
-                                        'user_type': user.user_type,
-                                        'ip_address': user.ip_address,
-                                        'profile_url': user.profile_url,
-                                        'verified_user': user.verified_user,
-                                        'active_user': user.active_user,
-                                        'created_at': user.created_at,
-                                        'last_login': user.last_login,
-                                        'fcm_id': user.fcm_id,
-                                        'latitude': user.latitude,
-                                        'longitude': user.longitude
-                                        })
-                    else:
-                        return jsonify({'return': 'wrong password'})
-                else:
-                    return jsonify({'return': 'user not found'})
-        except Exception as e:
-            return jsonify({'return': 'error signing in'+str(e)})
-    return jsonify({'return': 'no POST request'})
+        if not content or not content['email'] or not content['password']:
+            return make_response('could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+
+        user = Users.query.filter_by(email=content['email']).first()
+
+        if not user:
+            return make_response('could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+
+        if check_password_hash(user.password, content['password']):
+            token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=300)}, app.config['SECRET_KEY'])
+
+            return jsonify({'token' : token.decode('UTF-8')}) 
+    
+        return make_response('could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+    else:
+        return jsonify({'return': 'no POST request'})
+
+@app.route('/get_current_user', methods=['GET'])
+def get_current_user():
+
+     
+    if request.method == 'GET':
+        if current_user.is_authenticated:
+            return jsonify({
+                    'return': 'success', 
+                    'user': current_user.id,
+                    'email': current_user.email,
+                    'phone': current_user.phone,
+                    # 'password': current_user.password,
+                    'firstname': current_user.firstname,
+                    'lastname': current_user.lastname,
+                    'user_type': current_user.user_type,
+                    'ip_address': current_user.ip_address,
+                    'profile_url': current_user.profile_url,
+                    'verified_user': current_user.verified_user,
+                    'active_user': current_user.active_user,
+                    'created_at': current_user.created_at,
+                    'last_login': current_user.last_login,
+                    'fcm_id': current_user.fcm_id,
+                    'latitude': current_user.latitude,
+                    'longitude': current_user.longitude
+                    })
+        else:
+            return jsonify({'return': 'user not logged in'})
+
+
+@app.route('/sign_out', methods=['GET'])
+@login_required
+def sign_out():
+    logout_user()
+    return jsonify({'return': 'success'})
+
 
 @app.route('/get_users/<parm>', methods=['GET'])
-def get_users(parm):
+@token_required
+def get_users(jwt_current_user, parm):
 
+    # if not jwt_current_user:
+    #     return jsonify({'return': 'user not logged in'})
 
     def get_USER_query(user):
         user_json = {
                     'return': 'success', 
+                    'publci_id': user.public_id,
                     'user': user.username,
                     'email': user.email,
                     'phone': user.phone,
@@ -315,7 +529,9 @@ def get_users(parm):
     return jsonify({'return': 'no GET request'})
 
 
+
 @app.route('/get_categories', methods=['GET'])
+@token_required
 def get_categories():
     if request.method == 'GET':
         try:
@@ -645,7 +861,55 @@ def changeProductStatus(status):
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
+@app.route('/addToCart')
+def addToCart():
+    if request.method == 'GET':
+        try:
+            get_product = Products.query.filter_by(id=request.args.get('id')).first()
+            if get_product:
+                addtoCart =  CartItem(fk_user_id=current_user.id, 
+                                        fk_product_id=get_product.id, 
+                                        quantity=request.args.get('quantity'),
+                                        created_at=datetime.now(),
+                                        modified_at=datetime.now())
+                db.session.add(addtoCart)
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': get_product.product_name_en + 'product added to cart'})
+            else:
+                return jsonify({'return': 'error', 'message': 'product not found'})
+        except Exception as e: 
+            return jsonify({'return': 'error', 'message': 'error adding product to cart : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
 
+@app.route('/getCartItems')
+def getCartItems():
+    if request.method == 'GET':
+        try:
+            get_cart = CartItem.query.filter_by(fk_user_id=current_user.id).all()
+            if get_cart:
+                cart_json = []
+                for cart in get_cart:
+                    cart_json.append({
+                        'id': cart.id,
+                        'fk_user_id': cart.fk_user_id,
+                        'fk_product_id': cart.fk_product_id,
+                        'quantity': cart.quantity,
+                        'created_at': cart.created_at,
+                        'modified_at': cart.modified_at
+                    })
+                return jsonify({'return': 'success', 'cart': cart_json})
+            else:
+                return jsonify({'return': 'error', 'message': 'cart is empty'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error getting cart items : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+               
+
+
+    
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
 
