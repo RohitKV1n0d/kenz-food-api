@@ -105,6 +105,55 @@
 </ul>
 
 
+<h2>Banner API</h2>
+
+<h3>Get all Banners</h3>
+<ul>
+    <p>Get all data from banner table</p>
+    <p>URL: /banner</p>
+    <p>Method : GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/get_banners</p>
+    
+    Response Body: JSON Object
+    Example:
+    {
+        "banners": [
+            {
+                "active": null,
+                "banner_desc_ar": "هذا إدخال اختبار فرعي للقطط",
+                "banner_desc_en": "this is a test entery",
+                "banner_image_url": "FWA_LOGO.png",
+                "banner_name_ar": "إدخال الاختبار",
+                "banner_name_en": "test_xcat1",
+                "banner_order": null,
+                "id": 1
+            },
+            {
+                "active": null,
+                "banner_desc_ar": "إدخال اإدخال اإدخال اإدخال اإدخال اإدخال اإدخال ا",
+                "banner_desc_en": "this is about cat 2",
+                "banner_image_url": "hash-it-02.jpg",
+                "banner_name_ar": "إدخال اإدخال الاختبار",
+                "banner_name_en": "cat 2",
+                "banner_order": null,
+                "id": 2
+            },
+            {
+                "active": null,
+                "banner_desc_ar": "asd",
+                "banner_desc_en": "asd",
+                "banner_image_url": "TESLA_BLACK_AAA_shrink_10_transparent_-_kopie.png",
+                "banner_name_ar": "asd",
+                "banner_name_en": "test_xcat1",
+                "banner_order": null,
+                "id": 3
+            }
+        ],
+        "return": "success"
+    }
+
+
+
 <h2>Category APIs</h2>
 
 <h3>Get all Categories</h3>
