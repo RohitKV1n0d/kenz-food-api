@@ -32,6 +32,17 @@ UPLOAD_FOLDER = 'static/img/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+
+import time
+import random
+
+counter = 0
+
+def generate_order_id():
+    global counter
+    counter += 1
+    return str(int(time.time())) + str(counter).zfill(3)
+
 CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
@@ -92,6 +103,18 @@ class Users(db.Model, UserMixin):
     order_item_br = db.relationship('OrderItem', backref='order_item_br')
     order_details_br = db.relationship('OrderDetails', backref='order_details_br')
     payment_details_br = db.relationship('PaymentDetails', backref='payment_details_br')
+
+
+class BannerSection(db.Model):
+    __tablename__ = 'bannersection'
+    id = db.Column(db.Integer, primary_key=True)
+    banner_name_en = db.Column(db.String(100), nullable=False)
+    banner_name_ar = db.Column(db.String(100), nullable=True)
+    banner_order = db.Column(db.String(100), nullable=True)
+    banner_image_url = db.Column(db.String(100), nullable=False)
+    banner_desc_en = db.Column(db.String(100), nullable=True)
+    banner_desc_ar = db.Column(db.String(100), nullable=True)
+    status = db.Column(db.String(100), nullable=True)
 
 
 class ProductCategory(db.Model):
@@ -490,6 +513,28 @@ def get_users(jwt_current_user, parm):
             return jsonify({'return': 'error getting users : '+ str(e)})
     return jsonify({'return': 'no GET request'})
 
+@app.route('/banner', methods=['GET'])
+def banner():
+    if request.method == 'GET':
+        try:
+            get_banner = BannerSection.query.all()
+            if get_banner:
+                banner = []
+                for item in get_banner:
+                    banner.append({
+                        'id': item.id,
+                        'banner_name_en': item.banner_name_en,
+                        'banner_image_url': item.banner_image_url,
+                        'status': item.status,
+                        'banner_desc_en': item.banner_desc_en
+                    })
+                return jsonify({'return': 'success', 'message': 'banner fetched', 'data': banner})
+            else:
+                return jsonify({'return': 'error', 'message': 'banner not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching banner : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
 
 
 @app.route('/get_categories', methods=['GET'])
@@ -1128,6 +1173,35 @@ def clearWishlist(jwt_current_user):
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
+# @app.route('/order', methods=['PUT'])
+# @token_required
+# def order(jwt_current_user):
+#     if request.method == 'PUT':
+#         try:
+#             data = request.get_json()
+#             get_cart = UserCart.query.filter_by(fk_user_id=jwt_current_user.id).all()
+#             if get_cart:
+#                 for item in get_cart:
+#                     order = UserOrders(
+#                         fk_user_id=jwt_current_user.id,
+#                         fk_product_id=item.fk_product_id,
+#                         fk_product_stock_id=item.fk_product_stock_id,
+#                         quantity=item.quantity,
+#                         status='pending',
+#                         created_at=datetime.now(),
+#                         modified_at=datetime.now()
+#                     )
+#                     db.session.add(order)
+#                     db.session.commit()
+#                     db.session.delete(item)
+#                     db.session.commit()
+#                 return jsonify({'return': 'success', 'message': 'order placed'})
+#             else:
+#                 return jsonify({'return': 'error', 'message': 'cart is empty'})
+#         except Exception as e:
+#             return jsonify({'return': 'error', 'message': 'error placing order : '+ str(e)})
+#     else:
+#         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
@@ -1553,3 +1627,27 @@ def viewSubcatOnlyProducts(id):
     prod_img = ProductImages.query.all()
     prod_stock = ProductStock.query.all()
     return render_template('viewSubcatOnlyProducts.html', prod=prod, prod_img=prod_img,zip=zip, prod_stock=prod_stock, sub_cat=sub_cat)
+
+
+@app.route('/addBanner', methods=['GET', 'POST'])
+@login_required
+def addBanner():
+    if request.method == 'POST':
+        try:
+            with app.app_context():
+                img = request.files.get('banner_image_url')
+                img_filename = secure_filename(request.files['banner_image_url'].filename)
+                basedir = os.path.abspath(os.path.dirname(__file__))
+                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                banner = BannerSection(banner_name_en=request.form['banner_name_en'],
+                    banner_image_url=upload_image.link,
+                    banner_desc_en=request.form['banner_desc_en'],
+                    status=request.form['status']
+                )
+                db.session.add(banner)
+                db.session.commit()
+            return redirect(url_for('viewBanner'))
+        except Exception as e:
+            return jsonify({'return': 'error adding banner :- '+str(e)})
+    return render_template('addBanner.html')
