@@ -1,12 +1,42 @@
 <h1>Kenz-Food-APIs Documentaions</h1>
 
+<h2>User Authentication</h2>
+
+<h3>Sign In User</h3>
+<ul>
+    <p>Sign in a user by passing email and password</p>
+    <p>URL: /sign_in</p>
+    <p>Method: POST</p>
+    <p>URL Content-Type: JSON</p>
+    
+       
+        Example Input body:
+        {
+            "email" : "rohitvinod92@gmail.com",
+            "password" : "rkv123"
+        }
+
+        Example Response body:
+        {
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI4Yzk2MmI0Mi04ZTI0LTRhYjMtOTI4Ny02M2Y0OTA2NjI4OTkiLCJleHAiOjE2NzEzMDkzNjl9.u3u2eBxvdloQttUOEi1SePQF9HjIU1rz7MSXnnjj3EY"
+        }
+</ul>
+
+<h3>Token Headers format</h3>   
+<p>Headers : </p>
+    
+    var headers = {
+        'x-access-token': '[token]'
+        };
+
+
 <h2>User APIs</h2>
 
 
 <h3>Insert User</h3>
 <ul>
     <p>Insert a new user into the database</p>
-    <p>URL: /inster_users</p>
+    <p>URL: /insert_users</p>
     <p>Method: POST</p>
     <p>URL Content-Type: JSON</p>
     
@@ -25,40 +55,6 @@
       
 </ul>
 
-<h3>Sign In User</h3>
-<ul>
-    <p>Sign in a user by passing email and password</p>
-    <p>URL: /sign_in</p>
-    <p>Method: POST</p>
-    <p>URL Content-Type: JSON</p>
-    
-       
-        Example Input body:
-        {
-            "email" : "rohitvinod92@gmail.com",
-            "password" : "rkv123"
-        }
-
-        Example Response body:
-        {
-            "active_user": null,
-            "created_at": null,
-            "email": "rohitvinod92@gmail.com",
-            "fcm_id": null,
-            "firstname": "rohit",
-            "ip_address": "0.0.0.0",
-            "last_login": null,
-            "lastname": "vinod",
-            "latitude": null,
-            "longitude": null,
-            "phone": "1234567890",
-            "profile_url": null,
-            "return": "success",
-            "user": "rohit123",
-            "user_type": "user",
-            "verified_user": null
-        }
-</ul>
 
         
     
@@ -68,6 +64,9 @@
     <p>Get user data from database</p>
     <p>URL: /get_users/{parm}</p>
     <p>Method: GET</p>
+    
+
+
 
 <p>Pram list:-</p>
 
@@ -324,7 +323,7 @@
 
 <h3>Product Status</h3>
 <ul>
-    <p>Change Product Status</p>
+    <p>Change and Check Product Status</p>
     <p>URL: /changeProductStatus/{status}</p>
     <p>Method : GET</p>
     <p>Parameters : product_id, status</p>
@@ -346,6 +345,175 @@
     }
 
 </ul>
+
+<h2>Cart APIs</h2>
+
+<h3>Add Product to cart</h3>
+<ul>
+    <p>Add Product to cart with product id</p>
+    <p>URL: /cart/{product_id}</p>
+    <p>Method : POST</p>
+    <p>Parameters : product_id, quantity, user_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/cart/1</p>
+
+    Request Body: JSON Object
+    Example :
+    {
+        "quantity": "1"
+    }
+
+    Response Body: JSON Object
+    Example (If product is already in cart):
+    {
+        "message": "product quantity updated",
+        "return": "success"
+    }
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "product added to cart",
+        "return": "success"
+    }
+</ul>
+
+<h3>Get all items in Cart</h3>
+<ul>
+    <p>Get all items in cart</p>
+    <p>URL: /cart</p>
+    <p>Method : GET</p>
+    <p>Parameters : user_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/cart</p>
+
+    Response Body: JSON Object
+    Example Output:
+    {
+        "cart items": [
+            {
+                "cat_id": 1,
+                "created_at": "Sun, 18 Dec 2022 02:18:43 GMT",
+                "fast_delivery": null,
+                "featured": null,
+                "fresh": null,
+                "id": 2,
+                "modified_at": "Sun, 18 Dec 2022 02:18:43 GMT",
+                "offer": null,
+                "other_title_ar": null,
+                "other_title_en": null,
+                "product_barcode": null,
+                "product_cat_id": 1,
+                "product_code": null,
+                "product_desc_ar": "veg briyani - 2veg briyaasdani - 2veg briyani - 2vesdbriyani - asda2veg briyani - 2",
+                "product_desc_en": "veg briyandasdai - 2veg briyani - 2veg briyani - 2vegasda briyani - 2",
+                "product_id": 2,
+                "product_images": [
+                    {
+                        "id": 4,
+                        "product_id": 2,
+                        "product_image_url": "https://i.imgur.com/ECJ7Uws.jpg"
+                    },
+                    {
+                        "id": 5,
+                        "product_id": 2,
+                        "product_image_url": "https://i.imgur.com/erT6QGZ.jpg"
+                    },
+                    {
+                        "id": 6,
+                        "product_id": 2,
+                        "product_image_url": "https://i.imgur.com/SKdJx59.jpg"
+                    }
+                ],
+                "product_name_ar": "veg briyani - 2",
+                "product_name_en": "veg briyani - 2",
+                "product_stock": {
+                    "id": 2,
+                    "main_rack_no": null,
+                    "max_stock": "5435",
+                    "min_stock": "5",
+                    "opening_stock": "45",
+                    "product_id": 2,
+                    "product_offer_price": "345",
+                    "product_price": "5345",
+                    "product_purchase_price": "3453",
+                    "sub_rack_no": null
+                },
+                "product_subcat_id": 1,
+                "quantity": "5",
+                "status": "enable",
+                "subcat_id": 1,
+                "unit_quantity": "1234",
+                "user_id": 1
+            }
+        ],
+        "return": "success"
+    }
+</ul>
+
+<h3>Delete Cart item</h3>
+<ul>
+    <p>Delete a specific item in the cart with product id</p>
+    <p>URL: /cart/itemDelete/{product_id}</p>
+    <p>Method : DELETE</p>
+    <p>Parameters : product_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/cart/itemDelete/2</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "cart item deleted",
+        "return": "success"
+    }
+</ul>
+
+<h3>Clear cart</h3>
+<ul>
+    <p>Clear all items in cart</p>
+    <p>URL: /cart/clear</p>
+    <p>Method : DELETE</p>
+    <p>Parameters : user_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/cart/clear</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "cart cleared",
+        "return": "success"
+    }
+</ul>
+
+<h3>Increment Cart item</h3>
+<ul>
+    <p>Increment a specific item in the cart with product id by 1 (+1)</p>
+    <p>URL: /cart/incQty/{product_id}</p>
+    <p>Method : PUT</p>
+    <p>Parameters : product_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/cart/incQty/2</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "quantity increased",
+        "return": "success"
+    }
+</ul>
+
+<h3>Decrement Cart item</h3>
+<ul>
+    <p>Decrement a specific item in the cart with product id by 1 (-1)</p>
+    <p>URL: /cart/decQty/{product_id}</p>
+    <p>Method : PUT</p>
+    <p>Parameters : product_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/cart/decQty/2</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "quantity decreased",
+        "return": "success"
+    }
+</ul>   
+
+
 
     
     
