@@ -302,7 +302,7 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
-            jwt_current_user = Users.query.filter_by(id=data['public_id']).first()
+            jwt_current_user = Users.query.filter_by(public_id=data['public_id']).first()
         except:
             return jsonify({'message': 'Token is invalid!'}), 401
 
@@ -350,7 +350,7 @@ def insert_users():
         print(content)
         try: 
             with app.app_context():
-                user = Users(ip_address=content['ip_address'], 
+                user = Users(ip_address=request.remote_addr, 
                     user_type=content['user_type'],
                     public_id=str(uuid.uuid4()),
                     username=content['username'],
@@ -367,44 +367,6 @@ def insert_users():
             return jsonify({'return': 'error adding user'+str(e)})
     return jsonify({'return': 'no POST request'})
 
-# @app.route('/sign_in', methods=['POST'])
-# def sign_in():
-    
-#     if request.method == 'POST':
-#         content = request.json
-#         # print(content)
-#         try: 
-#             with app.app_context():
-#                 user = Users.query.filter_by(email=content['email']).first()
-#                 if user:
-#                     if user.password == content['password']:
-#                         login_user(user)
-#                         return jsonify({
-#                                         'return': 'success', 
-#                                         'user': user.username,
-#                                         'email': user.email,
-#                                         'phone': user.phone,
-#                                         # 'password': user.password,
-#                                         'firstname': user.firstname,
-#                                         'lastname': user.lastname,
-#                                         'user_type': user.user_type,
-#                                         'ip_address': user.ip_address,
-#                                         'profile_url': user.profile_url,
-#                                         'verified_user': user.verified_user,
-#                                         'active_user': user.active_user,
-#                                         'created_at': user.created_at,
-#                                         'last_login': user.last_login,
-#                                         'fcm_id': user.fcm_id,
-#                                         'latitude': user.latitude,
-#                                         'longitude': user.longitude
-#                                         })
-#                     else:
-#                         return jsonify({'return': 'wrong password'})
-#                 else:
-#                     return jsonify({'return': 'user not found'})
-#         except Exception as e:
-#             return jsonify({'return': 'error signing in'+str(e)})
-#     return jsonify({'return': 'no POST request'})
 
 @app.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
@@ -428,37 +390,37 @@ def sign_in():
     else:
         return jsonify({'return': 'no POST request'})
 
-@app.route('/get_current_user', methods=['GET'])
-def get_current_user():
+# @app.route('/get_current_user', methods=['GET'])
+# def get_current_user():
 
      
-    if request.method == 'GET':
-        if current_user.is_authenticated:
-            return jsonify({
-                    'return': 'success', 
-                    'user': current_user.id,
-                    'email': current_user.email,
-                    'phone': current_user.phone,
-                    # 'password': current_user.password,
-                    'firstname': current_user.firstname,
-                    'lastname': current_user.lastname,
-                    'user_type': current_user.user_type,
-                    'ip_address': current_user.ip_address,
-                    'profile_url': current_user.profile_url,
-                    'verified_user': current_user.verified_user,
-                    'active_user': current_user.active_user,
-                    'created_at': current_user.created_at,
-                    'last_login': current_user.last_login,
-                    'fcm_id': current_user.fcm_id,
-                    'latitude': current_user.latitude,
-                    'longitude': current_user.longitude
-                    })
-        else:
-            return jsonify({'return': 'user not logged in'})
+#     if request.method == 'GET':
+#         if current_user.is_authenticated:
+#             return jsonify({
+#                     'return': 'success', 
+#                     'user': current_user.id,
+#                     'email': current_user.email,
+#                     'phone': current_user.phone,
+#                     # 'password': current_user.password,
+#                     'firstname': current_user.firstname,
+#                     'lastname': current_user.lastname,
+#                     'user_type': current_user.user_type,
+#                     'ip_address': current_user.ip_address,
+#                     'profile_url': current_user.profile_url,
+#                     'verified_user': current_user.verified_user,
+#                     'active_user': current_user.active_user,
+#                     'created_at': current_user.created_at,
+#                     'last_login': current_user.last_login,
+#                     'fcm_id': current_user.fcm_id,
+#                     'latitude': current_user.latitude,
+#                     'longitude': current_user.longitude
+#                     })
+#         else:
+#             return jsonify({'return': 'user not logged in'})
 
 
 @app.route('/sign_out', methods=['GET'])
-@login_required
+@token_required
 def sign_out():
     logout_user()
     return jsonify({'return': 'success'})
@@ -861,17 +823,25 @@ def changeProductStatus(status):
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
-@app.route('/addToCart')
-def addToCart():
-    if request.method == 'GET':
+@app.route('/cart/<product_id>', methods=['POST'])
+@token_required
+def addToCart(jwt_current_user, product_id):
+    if request.method == 'POST':
+        content=request.get_json()
+        checkcartitem = CartItem.query.filter_by(fk_product_id=product_id).first()
         try:
-            get_product = Products.query.filter_by(id=request.args.get('id')).first()
+            if checkcartitem:
+                checkcartitem.quantity = int(checkcartitem.quantity) + int(content['quantity'])
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'product quantity updated'})
+        
+            get_product = Products.query.filter_by(id=product_id).first()
             if get_product:
-                addtoCart =  CartItem(fk_user_id=current_user.id, 
+                addtoCart =  CartItem(fk_user_id=jwt_current_user.id, 
                                         fk_product_id=get_product.id, 
-                                        quantity=request.args.get('quantity'),
-                                        created_at=datetime.now(),
-                                        modified_at=datetime.now())
+                                        quantity=content['quantity'],
+                                        created_at=datetime.datetime.now(),
+                                        modified_at=datetime.datetime.now())
                 db.session.add(addtoCart)
                 db.session.commit()
                 return jsonify({'return': 'success', 'message': get_product.product_name_en + 'product added to cart'})
@@ -882,23 +852,71 @@ def addToCart():
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
-@app.route('/getCartItems')
-def getCartItems():
+@app.route('/cart', methods=['GET'])
+@token_required
+def getCartItems(jwt_current_user):
     if request.method == 'GET':
         try:
-            get_cart = CartItem.query.filter_by(fk_user_id=current_user.id).all()
+            get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id).all()
+            
             if get_cart:
                 cart_json = []
+                products_stocks_json = []
+                products_images_json = []
                 for cart in get_cart:
+                    get_product_stocks = ProductStock.query.filter_by(fk_product_id=cart.fk_product_id).all()
+                    for product_stock in get_product_stocks:
+                        product_stock_json = {
+                            'id': product_stock.id,
+                            'product_price': product_stock.product_price,
+                            'product_offer_price': product_stock.product_offer_price,
+                            'product_purchase_price': product_stock.product_purchase_price,
+                            'opening_stock': product_stock.opening_stock,
+                            'min_stock': product_stock.min_stock,
+                            'max_stock': product_stock.max_stock,
+                            'main_rack_no': product_stock.main_rack_no,
+                            'sub_rack_no': product_stock.sub_rack_no,
+                            'product_id': product_stock.fk_product_id,
+                        }
+                        products_stocks_json.append(product_stock_json)
+                    get_product_images = ProductImages.query.filter_by(fk_product_id=cart.fk_product_id).all()
+                    for product_image in get_product_images:
+                        product_image_json = {
+                            'id': product_image.id,
+                            'product_image_url': product_image.product_image_url,
+                            'product_id': product_image.fk_product_id,
+                        }
+                        products_images_json.append(product_image_json)
                     cart_json.append({
                         'id': cart.id,
-                        'fk_user_id': cart.fk_user_id,
-                        'fk_product_id': cart.fk_product_id,
+                        'user_id': cart.fk_user_id,
+                        'product_id': cart.fk_product_id,
+                        'product_name_en': cart.cart_item.product_name_en,
+                        'product_name_ar': cart.cart_item.product_name_ar,
+                        'product_desc_en': cart.cart_item.product_desc_en,
+                        'product_desc_ar': cart.cart_item.product_desc_ar,
+                        'unit_quantity': cart.cart_item.unit_quantity,
+                        'product_code': cart.cart_item.product_code,
+                        'product_barcode': cart.cart_item.produc_barcode,
+                        'other_title_en': cart.cart_item.other_title_en,
+                        'other_title_ar': cart.cart_item.other_title_ar, 
+                        'status': cart.cart_item.status,
+                        'fast_delivery': cart.cart_item.fast_delivery,
+                        'featured': cart.cart_item.featured,
+                        'fresh': cart.cart_item.fresh,
+                        'offer': cart.cart_item.offer,
+                        'product_cat_id': cart.cart_item.cat,
+                        'product_subcat_id': cart.cart_item.subcat,
+                        'cat_id': cart.cart_item.cat,
+                        'subcat_id': cart.cart_item.subcat,
+                        'product_stock': product_stock_json,
+                        'product_images': products_images_json,
                         'quantity': cart.quantity,
                         'created_at': cart.created_at,
                         'modified_at': cart.modified_at
                     })
-                return jsonify({'return': 'success', 'cart': cart_json})
+                    
+                return jsonify({'return': 'success', 'cart items': cart_json})
             else:
                 return jsonify({'return': 'error', 'message': 'cart is empty'})
         except Exception as e:
@@ -908,8 +926,80 @@ def getCartItems():
 
                
 
+@app.route('/cart/itemDelete/<product_id>', methods=['DELETE'])
+@token_required
+def deleteCartItem(jwt_current_user, product_id):
+    if request.method == 'DELETE':
+        try:
+            get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            if get_cart:
+                db.session.delete(get_cart)
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'cart item deleted'})
+            else:
+                return jsonify({'return': 'error', 'message': 'cart item not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error deleting cart item : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
 
-    
+
+@app.route('/cart/clear', methods=['DELETE'])
+@token_required
+def clearCart(jwt_current_user):
+    if request.method == 'DELETE':
+        try:
+            get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id).all()
+            if get_cart:
+                for cart in get_cart:
+                    db.session.delete(cart)
+                    db.session.commit()
+                return jsonify({'return': 'success', 'message': 'cart cleared'})
+            else:
+                return jsonify({'return': 'error', 'message': 'cart is empty'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error clearing cart : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+@app.route('/cart/incQty/<product_id>', methods=['PUT'])
+@token_required
+def incQty(jwt_current_user, product_id):
+    if request.method == 'PUT':
+        try:
+            get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            if get_cart:
+                get_cart.quantity = int(get_cart.quantity) + 1
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'quantity increased'})
+            else:
+                return jsonify({'return': 'error', 'message': 'cart item not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error increasing quantity : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/cart/decQty/<product_id>', methods=['PUT'])
+@token_required
+def decQty(jwt_current_user, product_id):
+    if request.method == 'PUT':
+        try:
+            get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            if get_cart:
+                if int(get_cart.quantity) > 1:
+                    get_cart.quantity = int(get_cart.quantity) - 1
+                    db.session.commit()
+                    return jsonify({'return': 'success', 'message': 'quantity decreased'})
+                else:
+                    return jsonify({'return': 'error', 'message': 'quantity cannot be less than 1'})
+            else:
+                return jsonify({'return': 'error', 'message': 'cart item not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error decreasing quantity : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
 
