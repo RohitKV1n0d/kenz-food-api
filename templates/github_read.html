@@ -104,6 +104,109 @@
 
 </ul>
 
+<h3>Add User Address</h3>
+<ul>
+    <p>Add a new address for a user</p>
+    <p>URL: /user_addr</p>
+    <p>Method: POST</p>
+    <p>URL Content-Type: JSON</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr</p>
+    
+       
+        Example Input body:
+        {
+            'id': item.id,
+            'address_line1': item.address_line1,
+            'address_line2': item.address_line2,
+            'city': item.city,
+            'postal_code': item.postal_code,
+            'country': item.country,
+            'telephone': item.telephone,
+            'mobile': item.mobile,
+            'latitude': item.latitude,
+            'longitude': item.longitude,
+            'created_at': item.created_at,
+            'modified_at': item.modified_at,
+            'user_id': item.user_id
+        }
+</ul>
+
+<h3>Get User Address</h3>
+<ul>
+    <p>Get all address for a user</p>
+    <p>URL: /user_addr</p>
+    <p>Method: GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr</p>
+    
+       
+        Example Input body:
+        {
+            'id': item.id,
+            'address_line1': item.address_line1,
+            'address_line2': item.address_line2,
+            'city': item.city,
+            'postal_code': item.postal_code,
+            'country': item.country,
+            'telephone': item.telephone,
+            'mobile': item.mobile,
+            'latitude': item.latitude,
+            'longitude': item.longitude,
+            'created_at': item.created_at,
+            'modified_at': item.modified_at,
+            'user_id': item.user_id
+        }
+</ul>
+
+
+
+<h2>Banner API</h2>
+
+<h3>Get all Banners</h3>
+<ul>
+    <p>Get all data from banner table</p>
+    <p>URL: /banner</p>
+    <p>Method : GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/get_banners</p>
+    
+    Response Body: JSON Object
+    Example:
+    {
+        "banners": [
+            {
+                "active": null,
+                "banner_desc_ar": "هذا إدخال اختبار فرعي للقطط",
+                "banner_desc_en": "this is a test entery",
+                "banner_image_url": "FWA_LOGO.png",
+                "banner_name_ar": "إدخال الاختبار",
+                "banner_name_en": "test_xcat1",
+                "banner_order": null,
+                "id": 1
+            },
+            {
+                "active": null,
+                "banner_desc_ar": "إدخال اإدخال اإدخال اإدخال اإدخال اإدخال اإدخال ا",
+                "banner_desc_en": "this is about cat 2",
+                "banner_image_url": "hash-it-02.jpg",
+                "banner_name_ar": "إدخال اإدخال الاختبار",
+                "banner_name_en": "cat 2",
+                "banner_order": null,
+                "id": 2
+            },
+            {
+                "active": null,
+                "banner_desc_ar": "asd",
+                "banner_desc_en": "asd",
+                "banner_image_url": "TESLA_BLACK_AAA_shrink_10_transparent_-_kopie.png",
+                "banner_name_ar": "asd",
+                "banner_name_en": "test_xcat1",
+                "banner_order": null,
+                "id": 3
+            }
+        ],
+        "return": "success"
+    }
+
+
 
 <h2>Category APIs</h2>
 
