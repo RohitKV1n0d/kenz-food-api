@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'dev'
+ENV = 'prod'
 
 if ENV == 'dev' :
     app.debug = True
