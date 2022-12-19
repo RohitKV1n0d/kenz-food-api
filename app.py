@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -77,6 +77,7 @@ class Users(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     ip_address = db.Column(db.String(100))
+    # last_login_ip = db.Column(db.String(100))
     public_id = db.Column(db.String(100), unique=True)
     user_type = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(100), nullable=False)    
@@ -937,6 +938,9 @@ def addToCart(jwt_current_user, product_id):
         content=request.get_json()
         checkcartitem = CartItem.query.filter_by(fk_product_id=product_id).first()
         try:
+            if int(content['quantity']) < int(checkcartitem.unit_quantity):
+                return jsonify({'return': 'error', 'message': 'Requested Product stock is not available, Available stock is '+ str(checkcartitem.unit_quantity)})
+
             if checkcartitem:
                 checkcartitem.quantity = int(checkcartitem.quantity) + int(content['quantity'])
                 db.session.commit()
@@ -1032,13 +1036,14 @@ def getCartItems(jwt_current_user):
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
                
-
 @app.route('/cart/itemDelete/<product_id>', methods=['DELETE'])
 @token_required
 def deleteCartItem(jwt_current_user, product_id):
     if request.method == 'DELETE':
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            # if int(get_cart.unit_quantity) < 1:
+            #     return jsonify({'return': 'error', 'message': 'unit quantity must be greater than 0'})
             if get_cart:
                 get_cart.modified_at = datetime.datetime.now()
                 db.session.delete(get_cart)
@@ -1076,6 +1081,9 @@ def incQty(jwt_current_user, product_id):
     if request.method == 'PUT':
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            product_stock = ProductStock.query.filter_by(fk_product_id=product_id).first()
+            if int(get_cart.quantity) <= int(product_stock.min_stock):
+                return jsonify({'return': 'error', 'message': 'quantity must be less than min stock'})
             if get_cart:
                 get_cart.quantity = int(get_cart.quantity) + 1
                 get_cart.modified_at = datetime.datetime.now()
@@ -1095,6 +1103,7 @@ def decQty(jwt_current_user, product_id):
     if request.method == 'PUT':
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            product_stock = ProductStock.query.filter_by(fk_product_id=product_id).first()
             if get_cart:
                 if int(get_cart.quantity) > 1:
                     get_cart.quantity = int(get_cart.quantity) - 1
@@ -1102,7 +1111,10 @@ def decQty(jwt_current_user, product_id):
                     db.session.commit()
                     return jsonify({'return': 'success', 'message': 'quantity decreased'})
                 else:
-                    return jsonify({'return': 'error', 'message': 'quantity cannot be less than 1'})
+                    db.session.delete(get_cart)
+                    db.session.commit()
+                    return jsonify({'return': 'success', 'message': 'cart item deleted'})
+                    
             else:
                 return jsonify({'return': 'error', 'message': 'cart item not found'})
         except Exception as e:
@@ -1705,11 +1717,11 @@ def addBanner():
                 banner = BannerSection(banner_name_en=request.form['banner_name_en'],
                     banner_image_url=upload_image.link,
                     banner_desc_en=request.form['banner_desc_en'],
-                    status=request.form['status']
+                    # status=request.form['status']
                 )
                 db.session.add(banner)
                 db.session.commit()
-            return redirect(url_for('viewBanner'))
+            return redirect(url_for('addBanner'))
         except Exception as e:
             return jsonify({'return': 'error adding banner :- '+str(e)})
     return render_template('addBanner.html')
