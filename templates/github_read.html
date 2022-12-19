@@ -152,11 +152,50 @@
             'latitude': item.latitude,
             'longitude': item.longitude,
             'created_at': item.created_at,
-            'modified_at': item.modified_at,
-            'user_id': item.user_id
+            'modified_at': item.modified_at
         }
 </ul>
 
+<h3>Update User Address</h3>
+<ul>
+    <p>Update a address for a user</p>
+    <p>URL: /user_addr/{id}</p>
+    <p>Method: PUT</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr/1</p>
+    
+       
+        Example Input body:
+        {
+            'id': item.id,
+            'address_line1': item.address_line1,
+            'address_line2': item.address_line2,
+            'city': item.city,
+            'postal_code': item.postal_code,
+            'country': item.country,
+            'telephone': item.telephone,
+            'mobile': item.mobile,
+            'latitude': item.latitude,
+            'longitude': item.longitude,
+            'created_at': item.created_at,
+            'modified_at': item.modified_at
+        }
+</ul>
+
+<h3>Delete User Address</h3>
+<ul>
+    <p>Delete a address for a user</p>
+    <p>URL: /user_addr/{id}</p>
+    <p>Method: DELETE</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr/1</p>
+    
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "Address deleted",
+        "return": "success"
+    }
+</ul>
+       
 
 
 <h2>Banner API</h2>
