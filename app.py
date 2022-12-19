@@ -21,6 +21,8 @@ import datetime
 
 from functools import wraps
 
+import time
+import random
 
 
 
@@ -33,8 +35,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 
-import time
-import random
 
 counter = 0
 
@@ -407,6 +407,8 @@ def sign_in():
 
         if check_password_hash(user.password, content['password']):
             token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=300)}, app.config['SECRET_KEY'])
+            user.ip_address = request.remote_addr
+            db.session.commit()
 
             return jsonify({'token' : token.decode('UTF-8')}) 
     
@@ -574,7 +576,47 @@ def get_user_addr(jwt_current_user):
             return jsonify({'return': 'error', 'message': 'error fetching address : '+ str(e)})
     return jsonify({'return': 'no GET request'})
 
+@app.route('/user_addr/<id>', methods=['PUT'])
+@token_required
+def update_user_addr(jwt_current_user, id):
+    if request.method == 'PUT':
+        try:
+            data = request.get_json()
+            user_addr = UserAddress.query.filter_by(user_id=jwt_current_user.id,id=id).first()
+            if user_addr:
+                user_addr.address_line1 = data['address_line1']
+                user_addr.address_line2 = data['address_line2']
+                user_addr.city = data['city']
+                user_addr.postal_code = data['postal_code']
+                user_addr.country = data['country']
+                user_addr.telephone = data['telephone']
+                user_addr.mobile = data['mobile']
+                user_addr.latitude = data['latitude']
+                user_addr.longitude = data['longitude']
+                user_addr.modified_at = datetime.datetime.now()
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'address updated'})
+            else:
+                return jsonify({'return': 'error', 'message': 'address not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error updating address : '+ str(e)})
+    return jsonify({'return': 'no PUT request'})
 
+@app.route('/user_addr/<id>', methods=['DELETE'])
+@token_required
+def delete_user_addr(jwt_current_user, id):
+    if request.method == 'DELETE':
+        try:
+            user_addr = UserAddress.query.filter_by(user_id=jwt_current_user.id,id=id).first()
+            if user_addr:
+                db.session.delete(user_addr)
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'address deleted'})
+            else:
+                return jsonify({'return': 'error', 'message': 'address not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error deleting address : '+ str(e)})
+    return jsonify({'return': 'no DELETE request'})
 
 @app.route('/banner', methods=['GET'])
 def banner():
@@ -1721,7 +1763,54 @@ def addBanner():
                 )
                 db.session.add(banner)
                 db.session.commit()
-            return redirect(url_for('addBanner'))
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            
+            return redirect(url_for('viewBanner'))
         except Exception as e:
             return jsonify({'return': 'error adding banner :- '+str(e)})
     return render_template('addBanner.html')
+
+@app.route('/viewBanner', methods=['GET', 'POST'])
+@login_required
+def viewBanner():
+    banner = BannerSection.query.all()
+    return render_template('viewBanner.html', banner=banner)
+
+@app.route('/editBanner/<id>', methods=['GET', 'POST'])
+@login_required
+def editBanner(id):
+    banner = BannerSection.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            with app.app_context():
+                img = request.files.get('banner_image_url')
+                img_filename = secure_filename(request.files['banner_image_url'].filename)
+                if img_filename != '':
+                    basedir = os.path.abspath(os.path.dirname(__file__))
+                    img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                    upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                    banner.banner_image_url=upload_image.link
+                    os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                else:
+                    pass
+                banner.banner_name_en=request.form['banner_name_en']
+                banner.banner_desc_en=request.form['banner_desc_en']
+                # banner.status=request.form['status']
+                db.session.commit()
+                
+            
+            return redirect(url_for('viewBanner'))
+        except Exception as e:
+            return jsonify({'return': 'error getting banner :- '+str(e)})
+    return render_template('editBanner.html', banner=banner)
+
+@app.route('/deleteBanner/<id>', methods=['GET', 'POST'])
+@login_required
+def deleteBanner(id):
+    banner = BannerSection.query.get_or_404(id)
+    try:
+        db.session.delete(banner)
+        db.session.commit()
+        return redirect(url_for('viewBanner'))
+    except Exception as e:
+        return jsonify({'return': 'error deleting banner :- '+str(e)})
