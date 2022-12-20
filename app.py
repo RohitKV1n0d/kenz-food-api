@@ -990,8 +990,8 @@ def addToCart(jwt_current_user, product_id):
         
             get_product = Products.query.filter_by(id=product_id).first()
             if get_product:
-                if int(content['quantity']) < int(checkcartitem.quantity):
-                    return jsonify({'return': 'error', 'message': 'Requested Product stock is not available, Available stock is '+ str(checkcartitem.quantity)})
+                # if int(content['quantity']) < int(checkcartitem.quantity):
+                #     return jsonify({'return': 'error', 'message': 'Requested Product stock is not available, Available stock is '+ str(checkcartitem.quantity)})
 
                 addtoCart =  CartItem(fk_user_id=jwt_current_user.id, 
                                         fk_product_id=get_product.id, 
