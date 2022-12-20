@@ -643,7 +643,6 @@ def banner():
 
 
 @app.route('/get_categories', methods=['GET'])
-@token_required
 def get_categories():
     if request.method == 'GET':
         try:
