@@ -1072,7 +1072,7 @@ def getCartItems(jwt_current_user):
                         'modified_at': cart.modified_at
                     })
                     
-                return jsonify({'return': 'success', 'cart items': cart_json})
+                return jsonify({'return': 'success', 'cart_items': cart_json})
             else:
                 return jsonify({'return': 'error', 'message': 'cart is empty'})
         except Exception as e:
