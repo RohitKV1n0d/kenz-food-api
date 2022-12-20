@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -406,7 +406,7 @@ def sign_in():
             return make_response('could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
         if check_password_hash(user.password, content['password']):
-            token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=300)}, app.config['SECRET_KEY'])
+            token = jwt.encode({'public_id': user.public_id}, app.config['SECRET_KEY'])
             user.ip_address = request.remote_addr
             db.session.commit()
 
@@ -979,9 +979,7 @@ def addToCart(jwt_current_user, product_id):
         content=request.get_json()
         checkcartitem = CartItem.query.filter_by(fk_product_id=product_id).first()
         try:
-            if int(content['quantity']) < int(checkcartitem.unit_quantity):
-                return jsonify({'return': 'error', 'message': 'Requested Product stock is not available, Available stock is '+ str(checkcartitem.unit_quantity)})
-
+           
             if checkcartitem:
                 checkcartitem.quantity = int(checkcartitem.quantity) + int(content['quantity'])
                 db.session.commit()
@@ -989,6 +987,9 @@ def addToCart(jwt_current_user, product_id):
         
             get_product = Products.query.filter_by(id=product_id).first()
             if get_product:
+                if int(content['quantity']) < int(checkcartitem.quantity):
+                    return jsonify({'return': 'error', 'message': 'Requested Product stock is not available, Available stock is '+ str(checkcartitem.unit_quantity)})
+
                 addtoCart =  CartItem(fk_user_id=jwt_current_user.id, 
                                         fk_product_id=get_product.id, 
                                         quantity=content['quantity'],
