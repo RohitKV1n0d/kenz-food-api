@@ -1071,6 +1071,8 @@ def getCartItems(jwt_current_user):
                         'created_at': cart.created_at,
                         'modified_at': cart.modified_at
                     })
+                    products_stocks_json = []
+                    products_images_json = []
                     
                 return jsonify({'return': 'success', 'cart_items': cart_json})
             else:
