@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'dev'
+ENV = 'prod'
 
 if ENV == 'dev' :
     app.debug = True
@@ -270,6 +270,8 @@ class CartItem(db.Model):
     fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
+
+
 class OrderItem(db.Model):
     __tablename__ = 'orderitem'
     id = db.Column(db.Integer, primary_key=True)
@@ -443,6 +445,7 @@ def sign_in():
 #                     })
 #         else:
 #             return jsonify({'return': 'user not logged in'})
+
 
 
 @app.route('/sign_out', methods=['GET'])
