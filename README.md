@@ -127,7 +127,7 @@
         }
 </ul>
 
-<h3>Get User Address</h3>
+<h3>Get All User Address</h3>
 <ul>
     <p>Get all address for a user</p>
     <p>URL: /user_addr</p>
@@ -135,7 +135,7 @@
     <p>Example : https://kenz-food-api.herokuapp.com/user_addr</p>
     
        
-        Example Input body:
+        Example Response body:
         {
             'id': 1,
             'address_line1': "address_line123",
@@ -153,6 +153,70 @@
         }
 </ul>
 
+<h3>Get User Address with id</h3>
+<ul>
+    <p>Get a address for a user</p>
+    <p>URL: /user_addr/{id}</p>
+    <p>Method: GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr/1</p>
+    
+       
+        Example Response body:
+        {
+            'id': 1,
+            'address_line1': "address_line123",
+            'address_line2': "address_line123",
+            'city': "cityxyz",
+            'postal_code': "123456",
+            'country': "countryxyz",
+            'telephone': "1234567890",
+            'mobile':   "1234567890",
+            'latitude':  '10.995003718149182',
+            'longitude': '76.99166976233744',
+            'created_at':  '2021-08-03T09:00:00.000Z',
+            'modified_at': '2021-08-03T09:00:00.000Z',
+            'user_id': 1
+        }
+</ul>
+
+<h3>Update User Address</h3>
+<ul>
+    <p>Update a address for a user</p>
+    <p>URL: /user_addr/{id}</p>
+    <p>Method: PUT</p>
+    <p>URL Content-Type: JSON</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr/1</p>
+    
+       
+        Example Input body:
+        {
+            'address_line1': "address_line112",
+            'address_line2': "address_line2223",
+            'city': "cityxyz12",
+            'postal_code': "123456213",
+            'country': "countryxyz13",
+            'telephone': "1234522890",
+            'mobile': "1234567220",
+            'latitude': '10.99500312312718149182', 
+            'longitude': '76.99166976212333744'
+        }
+
+</ul>
+
+<h3>Delete User Address</h3>
+<ul>
+    <p>Delete a address for a user</p>
+    <p>URL: /user_addr/{id}</p>
+    <p>Method: DELETE</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_addr/1</p>
+    
+       
+        Example Response body:
+        {
+            'message': 'Address deleted successfully',
+            'return': 'success'
+        }
+</ul>
 
 
 <h2>Banner API</h2>
