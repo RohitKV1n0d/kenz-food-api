@@ -720,6 +720,26 @@
     }
 </ul>
 
+<h3>Check for an item in Wishlist</h3>
+<ul>
+    <p>Check if a specific item is in the wishlist with product id</p>
+    <p>URL: /wishlist/check/{product_id}</p>
+    <p>Method : GET</p>
+    <p>Parameters : product_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/wishlist/check/2</p>
+
+    Response Body: JSON Object
+    Example 1:
+    {
+        "message": "product in wishlist",
+        "return": "True"
+    }
+    Example 2:
+    {
+        "message": "product not in wishlist",
+        "return": "False"
+    }
+</ul>
 
 
 
