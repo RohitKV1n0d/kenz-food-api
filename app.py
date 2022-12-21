@@ -68,7 +68,7 @@ else:
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-db =SQLAlchemy(app)
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
@@ -456,8 +456,7 @@ def sign_out():
 
 
 @app.route('/get_users/<parm>', methods=['GET'])
-@token_required
-def get_users(jwt_current_user, parm):
+def get_users( parm):
 
     # if not jwt_current_user:
     #     return jsonify({'return': 'user not logged in'})
@@ -573,6 +572,34 @@ def get_user_addr(jwt_current_user):
                         'user_id': item.user_id
                     })
                 return jsonify({'return': 'success', 'message': 'address fetched', 'data': user_addr_list})
+            else:
+                return jsonify({'return': 'error', 'message': 'address not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching address : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+
+@app.route('/user_addr/<id>', methods=['GET'])
+@token_required
+def get_user_addr_by_id(jwt_current_user, id):
+    if request.method == 'GET':
+        try:
+            user_addr = UserAddress.query.filter_by(user_id=jwt_current_user.id,id=id).first()
+            if user_addr:
+                return jsonify({'return': 'success', 'message': 'address fetched', 'data': {
+                    'id': user_addr.id,
+                    'address_line1': user_addr.address_line1,
+                    'address_line2': user_addr.address_line2,
+                    'city': user_addr.city,
+                    'postal_code': user_addr.postal_code,
+                    'country': user_addr.country,
+                    'telephone': user_addr.telephone,
+                    'mobile': user_addr.mobile,
+                    'latitude': user_addr.latitude,
+                    'longitude': user_addr.longitude,
+                    'created_at': user_addr.created_at,
+                    'modified_at': user_addr.modified_at,
+                    'user_id': user_addr.user_id
+                }})
             else:
                 return jsonify({'return': 'error', 'message': 'address not found'})
         except Exception as e:
@@ -1293,6 +1320,23 @@ def clearWishlist(jwt_current_user):
             return jsonify({'return': 'error', 'message': 'error clearing wishlist : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+@app.route('/wishlist/check/<product_id>', methods=['GET'])
+@token_required
+def checkWishlist(jwt_current_user, product_id):
+    if request.method == 'GET':
+        try:
+            get_wishlist = UserWhishlist.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            if get_wishlist:
+                return jsonify({'return': 'True', 'message': 'product found in wishlist'})
+            else:
+                return jsonify({'return': 'False', 'message': 'product not found in wishlist'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error checking wishlist : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
 
 # @app.route('/order', methods=['PUT'])
 # @token_required

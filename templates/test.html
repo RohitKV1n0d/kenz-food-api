@@ -1,58 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-  <div class="slider">
-    <div class="slide">
-      <img src="/static/img/uploads/TESLA_RECHARGEABLE_9V_transparent" alt="Image 1">
-    </div>
-    <div class="slide">
-      <img src="/static/img/uploads/TESLA_RECHARGEABLE_9V_transparent" alt="Image 2">
-    </div>
-    <div class="slide">
-      <img src="/static/img/uploads/TESLA_RECHARGEABLE_9V_transparent" alt="Image 3">
-    </div>
-  </div>
-        
-     <style>
-      .slider {
-  position: relative;
-  overflow: hidden;
-  height: 300px;
-}
+from flask_sqlalchemy import SQLAlchemy
 
-.slide {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
+db = SQLAlchemy()
 
-.slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-     </style>
-  
-  
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, server_default=db.text("nextval('order_id_seq'::regclass)"))
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
+    status = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
-  <script>
-    var slides = document.querySelectorAll('.slide');
-var currentSlide = 0;
-var slideInterval = setInterval(nextSlide,3000);
-
-function nextSlide() {
-  slides[currentSlide].classList.remove('active');
-  currentSlide = (currentSlide+1)%slides.length;
-  slides[currentSlide].classList.add('active');
-}
-
-  </script>
-      
-</body>
-</html>
+class Orderitem(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, server_default=db.text("nextval('orderitem_id_seq'::regclass)"))
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+    quantity = db.Column(db.Integer)
