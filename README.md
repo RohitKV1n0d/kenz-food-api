@@ -115,19 +115,15 @@
        
         Example Input body:
         {
-            'id': item.id,
-            'address_line1': item.address_line1,
-            'address_line2': item.address_line2,
-            'city': item.city,
-            'postal_code': item.postal_code,
-            'country': item.country,
-            'telephone': item.telephone,
-            'mobile': item.mobile,
-            'latitude': item.latitude,
-            'longitude': item.longitude,
-            'created_at': item.created_at,
-            'modified_at': item.modified_at,
-            'user_id': item.user_id
+            'address_line1': "address_line1",
+            'address_line2': "address_line2",
+            'city': "cityxyz",
+            'postal_code': "123456",
+            'country': "countryxyz",
+            'telephone': "1234567890",
+            'mobile': "1234567890",
+            'latitude': '10.995003718149182', 
+            'longitude': '76.99166976233744'
         }
 </ul>
 
@@ -141,19 +137,19 @@
        
         Example Input body:
         {
-            'id': item.id,
-            'address_line1': item.address_line1,
-            'address_line2': item.address_line2,
-            'city': item.city,
-            'postal_code': item.postal_code,
-            'country': item.country,
-            'telephone': item.telephone,
-            'mobile': item.mobile,
-            'latitude': item.latitude,
-            'longitude': item.longitude,
-            'created_at': item.created_at,
-            'modified_at': item.modified_at,
-            'user_id': item.user_id
+            'id': 1,
+            'address_line1': "address_line123",
+            'address_line2': "address_line123",
+            'city': "cityxyz",
+            'postal_code': "123456",
+            'country': "countryxyz",
+            'telephone': "1234567890",
+            'mobile':   "1234567890",
+            'latitude':  '10.995003718149182',
+            'longitude': '76.99166976233744',
+            'created_at':  '2021-08-03T09:00:00.000Z',
+            'modified_at': '2021-08-03T09:00:00.000Z',
+            'user_id': 1
         }
 </ul>
 
