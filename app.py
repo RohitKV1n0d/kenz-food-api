@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -68,7 +68,7 @@ else:
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-db =SQLAlchemy(app)
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
@@ -456,8 +456,7 @@ def sign_out():
 
 
 @app.route('/get_users/<parm>', methods=['GET'])
-@token_required
-def get_users(jwt_current_user, parm):
+def get_users( parm):
 
     # if not jwt_current_user:
     #     return jsonify({'return': 'user not logged in'})
@@ -1293,6 +1292,23 @@ def clearWishlist(jwt_current_user):
             return jsonify({'return': 'error', 'message': 'error clearing wishlist : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+@app.route('/wishlist/check/<product_id>', methods=['GET'])
+@token_required
+def checkWishlist(jwt_current_user, product_id):
+    if request.method == 'GET':
+        try:
+            get_wishlist = UserWhishlist.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
+            if get_wishlist:
+                return jsonify({'return': 'True', 'message': 'product found in wishlist'})
+            else:
+                return jsonify({'return': 'False', 'message': 'product not found in wishlist'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error checking wishlist : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
 
 # @app.route('/order', methods=['PUT'])
 # @token_required
