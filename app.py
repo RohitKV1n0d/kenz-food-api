@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'dev'
+ENV = 'prod'
 
 if ENV == 'dev' :
     app.debug = True
@@ -572,6 +572,34 @@ def get_user_addr(jwt_current_user):
                         'user_id': item.user_id
                     })
                 return jsonify({'return': 'success', 'message': 'address fetched', 'data': user_addr_list})
+            else:
+                return jsonify({'return': 'error', 'message': 'address not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching address : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+
+@app.route('/user_addr/<id>', methods=['GET'])
+@token_required
+def get_user_addr_by_id(jwt_current_user, id):
+    if request.method == 'GET':
+        try:
+            user_addr = UserAddress.query.filter_by(user_id=jwt_current_user.id,id=id).first()
+            if user_addr:
+                return jsonify({'return': 'success', 'message': 'address fetched', 'data': {
+                    'id': user_addr.id,
+                    'address_line1': user_addr.address_line1,
+                    'address_line2': user_addr.address_line2,
+                    'city': user_addr.city,
+                    'postal_code': user_addr.postal_code,
+                    'country': user_addr.country,
+                    'telephone': user_addr.telephone,
+                    'mobile': user_addr.mobile,
+                    'latitude': user_addr.latitude,
+                    'longitude': user_addr.longitude,
+                    'created_at': user_addr.created_at,
+                    'modified_at': user_addr.modified_at,
+                    'user_id': user_addr.user_id
+                }})
             else:
                 return jsonify({'return': 'error', 'message': 'address not found'})
         except Exception as e:
