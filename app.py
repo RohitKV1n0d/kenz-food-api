@@ -1,5 +1,5 @@
 #flask boilerpalte
-from flask import Flask, request, jsonify, render_template, url_for ,redirect, session, make_response
+from flask import Flask, request, jsonify, render_template, url_for ,redirect, session, make_response, flash
 #sql
 from flask_sqlalchemy import SQLAlchemy
 
@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -101,9 +101,9 @@ class Users(db.Model, UserMixin):
     user_address = db.relationship('UserAddress', backref='user_address')
     user_whishlist_br = db.relationship('UserWhishlist', backref='user_whishlist_br')
     user_cart_br = db.relationship('CartItem', backref='user_cart_br')
-    order_item_br = db.relationship('OrderItem', backref='order_item_br')
-    order_details_br = db.relationship('OrderDetails', backref='order_details_br')
-    payment_details_br = db.relationship('PaymentDetails', backref='payment_details_br')
+    order_br = db.relationship('Order', backref='order_br')
+    # order_details_br = db.relationship('OrderDetails', backref='order_details_br')
+    # payment_details_br = db.relationship('PaymentDetails', backref='payment_details_br')
 
 
 class BannerSection(db.Model):
@@ -177,9 +177,9 @@ class Products(db.Model):
 
     user_whishlist = db.relationship('UserWhishlist', backref='user_whishlist')
     cart_item = db.relationship('CartItem', backref='cart_item')
-    order_item = db.relationship('OrderItem', backref='order_item')
+    # order_item = db.relationship('OrderItem', backref='order_item')
     order_details = db.relationship('OrderDetails', backref='order_details')
-    payment_details = db.relationship('PaymentDetails', backref='payment_details')
+    # payment_details = db.relationship('PaymentDetails', backref='payment_details')
     
 
     product_image = db.relationship('ProductImages', backref='product_image')
@@ -266,40 +266,39 @@ class CartItem(db.Model):
     quantity = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     modified_at = db.Column(db.DateTime, nullable=True)
+    # payment_method = db.Column(db.String(100), nullable=False)
 
     fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
 
 
-class OrderItem(db.Model):
-    __tablename__ = 'orderitem'
+class Order(db.Model):
+    __tablename__ = 'order'
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.String(100), nullable=False)
-    quantity = db.Column(db.String(100), nullable=False)
+    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    total_quantity = db.Column(db.String(100), nullable=False)
+    total_price = db.Column(db.String(100), nullable=False)
+    # payment_method = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, nullable=True)
     modified_at = db.Column(db.DateTime, nullable=True)
 
-    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    order_details_oi = db.relationship('OrderDetails', backref='order_details_oi')
-    # payment_details = db.relationship('PaymentDetails', backref='payment_details')
+    ord = db.relationship('OrderDetails', backref='ord')
+    pay_ord = db.relationship('PaymentDetails', backref='pay_ord')
 
 
 class OrderDetails(db.Model):
     __tablename__ = 'orderdetails'
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.String(100), nullable=True)
+    fk_order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
+    item_quantity = db.Column(db.String(100), nullable=False)
     order_date = db.Column(db.DateTime, nullable=True)
-    order_status = db.Column(db.String(100), nullable=True)
-    order_total = db.Column(db.String(100), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=True)
-    modified_at = db.Column(db.DateTime, nullable=True)
+    delivery_mode = db.Column(db.DateTime, nullable=True) 
 
-    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    fk_order_id = db.Column(db.Integer, db.ForeignKey('orderitem.id'))
-    
+
+
 class PaymentDetails(db.Model):
     __tablename__ = 'paymentdetails'
     id = db.Column(db.Integer, primary_key=True)
@@ -311,9 +310,7 @@ class PaymentDetails(db.Model):
     created_at = db.Column(db.DateTime, nullable=True)
     modified_at = db.Column(db.DateTime, nullable=True)
 
-    fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    fk_order_id = db.Column(db.Integer, db.ForeignKey('orderitem.id'))
+    fk_order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
 
 def token_required(f):
     @wraps(f)
@@ -519,6 +516,8 @@ def get_users( parm):
     return jsonify({'return': 'no GET request'})
 
 
+
+
 @app.route('/user_addr', methods=['POST'])
 @token_required
 def user_addr(jwt_current_user):
@@ -545,7 +544,6 @@ def user_addr(jwt_current_user):
         except Exception as e:
             return jsonify({'return': 'error', 'message': 'error adding address : '+ str(e)})
     return jsonify({'return': 'no POST request'})
-
 
 @app.route('/user_addr', methods=['GET'])
 @token_required
@@ -648,6 +646,9 @@ def delete_user_addr(jwt_current_user, id):
             return jsonify({'return': 'error', 'message': 'error deleting address : '+ str(e)})
     return jsonify({'return': 'no DELETE request'})
 
+
+
+
 @app.route('/banner', methods=['GET'])
 def banner():
     if request.method == 'GET':
@@ -670,6 +671,10 @@ def banner():
             return jsonify({'return': 'error', 'message': 'error fetching banner : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+
+
 
 
 @app.route('/get_categories', methods=['GET'])
@@ -739,6 +744,7 @@ def get_products_images():
         except Exception as e:
             return jsonify({'return': 'error getting product images : '+ str(e)})
     return jsonify({'return': 'no GET request'})
+
 
 @app.route('/get_product_stocks', methods=['GET'])
 def get_product_stocks():
@@ -1002,6 +1008,11 @@ def changeProductStatus(status):
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
+
+
+
+
+
 @app.route('/cart/<product_id>', methods=['POST'])
 @token_required
 def addToCart(jwt_current_user, product_id):
@@ -1034,6 +1045,7 @@ def addToCart(jwt_current_user, product_id):
             return jsonify({'return': 'error', 'message': 'error adding product to cart : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
 
 @app.route('/cart', methods=['GET'])
 @token_required
@@ -1149,6 +1161,7 @@ def clearCart(jwt_current_user):
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
+
 @app.route('/cart/incQty/<product_id>', methods=['PUT'])
 @token_required
 def incQty(jwt_current_user, product_id):
@@ -1195,6 +1208,9 @@ def decQty(jwt_current_user, product_id):
             return jsonify({'return': 'error', 'message': 'error decreasing quantity : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+
 
 
 @app.route('/wishlist/<product_id>', methods=['POST'])
@@ -1277,6 +1293,8 @@ def getWishlist(jwt_current_user):
                         'created_at': item.created_at,
                         'modified_at': item.modified_at
                     })
+                    products_stocks_json = []
+                    products_images_json = []
                 return jsonify({'return': 'success', 'message': 'wishlist fetched', 'data': wishlist})
             else:
                 return jsonify({'return': 'error', 'message': 'wishlist is empty'})
@@ -1284,7 +1302,6 @@ def getWishlist(jwt_current_user):
             return jsonify({'return': 'error', 'message': 'error fetching wishlist : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
-
 
 @app.route('/wishlist/<product_id>', methods=['DELETE'])
 @token_required
@@ -1338,35 +1355,297 @@ def checkWishlist(jwt_current_user, product_id):
 
 
 
-# @app.route('/order', methods=['PUT'])
+
+
+@app.route('/order', methods=['POST'])
+@token_required
+def cartToOrder(jwt_current_user):
+    if request.method == 'POST':
+        try:
+            get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id).all()
+            # get_cart_items = Products.query.filter_by(id=get_cart.fk_product_id).all()
+            # get_item_stocks = ProductStock.query.filter_by(fk_product_id=get_cart.fk_product_id1).all()
+            if get_cart:
+                total_price = 0
+                total_quantity = 0
+                for item in get_cart:
+                    get_item_stocks = ProductStock.query.filter_by(fk_product_id=item.fk_product_id).first()
+                    total_price += int(get_item_stocks.product_price) * int(item.quantity)
+                    total_quantity = total_quantity + 1
+
+                order = Order(
+                    fk_user_id=jwt_current_user.id,
+                    total_price=total_price,
+                    total_quantity=total_quantity,
+                    # payment_method= get_cart,
+                    status='pending',
+                    created_at=datetime.datetime.now(),
+                    modified_at=datetime.datetime.now()
+                )
+                db.session.add(order)
+                db.session.commit()
+
+                for item in get_cart:   
+                    order_item = OrderDetails(
+                        fk_order_id=order.id,
+                        fk_product_id=item.fk_product_id,
+                        item_quantity=item.quantity,
+                        order_date=datetime.datetime.now()
+                
+                    )
+                    db.session.add(order_item)
+                    db.session.commit()
+
+                #clear cart
+                for item in get_cart:
+                    db.session.delete(item)
+                    db.session.commit()
+                
+                return jsonify({'return': 'success', 'message': 'order placed'})
+        
+            return jsonify({'return': 'error', 'message': 'No Cart found'})
+                    
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error placing order : '+ str(e)})
+            
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/order', methods=['GET'])
+@token_required
+def getOrders(jwt_current_user):
+    if request.method == 'GET':
+        try:
+            get_orders = Order.query.filter_by(fk_user_id=jwt_current_user.id).all()
+            if get_orders:
+                orders = []
+                for item in get_orders:
+                    orders.append({
+                        'id': item.id,
+                        'total_price': item.total_price,
+                        'total_quantity': item.total_quantity,
+                        'status': item.status,
+                        'created_at': item.created_at,
+                        'modified_at': item.modified_at
+                    })
+                return jsonify({'return': 'success', 'orders': orders})
+            else:
+                return jsonify({'return': 'error', 'message': 'No Orders found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error getting orders : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/order/<order_id>', methods=['GET'])
+@token_required
+def getOrderDetails(jwt_current_user, order_id):
+    if request.method == 'GET':
+        try:
+            get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id, id=order_id).first()
+            if get_order:
+                order_details = {
+                        'id': get_order.id,
+                        'total_price': get_order.total_price,
+                        'total_quantity': get_order.total_quantity,
+                        'status': get_order.status,
+                        'created_at': get_order.created_at,
+                        'modified_at': get_order.modified_at
+                    }
+
+                return jsonify({'return': 'success', 'order_details': order_details})
+            else:
+                return jsonify({'return': 'error', 'message': 'No Order found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error getting order details : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+
+# @app.route('/order/details', methods=['GET'])
 # @token_required
-# def order(jwt_current_user):
-#     if request.method == 'PUT':
+# def getAllOrderDetailsWithProduct(jwt_current_user):
+    if request.method == 'GET':
+        try:
+            get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id).all()
+            if get_order:
+                order_details = []
+                for item in get_order:
+                    get_order_details = OrderDetails.query.filter_by(fk_order_id=item.id).all()
+                    for item in get_order_details:
+                        get_product = Products.query.filter_by(id=item.fk_product_id).first()
+                        order_details.append({
+                            'id': item.id,
+                            'fk_order_id': item.fk_order_id,
+                            'fk_product_id': item.fk_product_id,
+                            'order_date': item.order_date,
+                           
+                        })
+                return jsonify({'return': 'success', 'order_details': order_details})
+            else:
+                return jsonify({'return': 'error', 'message': 'No Order found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error getting order details : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/order/<order_id>', methods=['DELETE'])
+@token_required
+def cancelOrder(jwt_current_user, order_id):
+    if request.method == 'DELETE':
+        try:
+            get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id, id=order_id).first()
+            if get_order:
+                get_order.status = 'cancelled'
+                db.session.commit()
+                return jsonify({'return': 'success', 'message': 'order cancelled'})
+            else:
+                return jsonify({'return': 'error', 'message': 'No Order found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error cancelling order : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/order/details/<order_id>', methods=['GET'])
+@token_required
+def getOrderDetailsWithProduct(jwt_current_user, order_id):
+    if request.method == 'GET':
+        try:
+            get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id, id=order_id).first()
+            if get_order:
+                get_order_details = OrderDetails.query.filter_by(fk_order_id=get_order.id).all()
+                order_details = []
+                products_images_json = []
+                products_stocks_json = []
+                for item in get_order_details:
+                    product = Products.query.filter_by(id=item.fk_product_id).first()
+                    get_product_stocks = ProductStock.query.filter_by(fk_product_id=product.id).all()
+                    for product_stock in get_product_stocks:
+                            product_stock_json = {
+                                'id': product_stock.id,
+                                'product_price': product_stock.product_price,
+                                'product_offer_price': product_stock.product_offer_price,
+                                'product_purchase_price': product_stock.product_purchase_price,
+                                'opening_stock': product_stock.opening_stock,
+                                'min_stock': product_stock.min_stock,
+                                'max_stock': product_stock.max_stock,
+                                'main_rack_no': product_stock.main_rack_no,
+                                'sub_rack_no': product_stock.sub_rack_no,
+                                'product_id': product_stock.fk_product_id,
+                            }
+                            products_stocks_json.append(product_stock_json)
+                            # order_details['product_stock'] = products_stocks_json
+                    get_product_images = ProductImages.query.filter_by(fk_product_id=product.id).all()
+                    for product_image in get_product_images:
+                        product_image_json = {
+                            'id': product_image.id,
+                            'product_image_url': product_image.product_image_url,
+                            'product_id': product_image.fk_product_id,
+                        }
+                        products_images_json.append(product_image_json)
+                        # order_details['product_images'] = products_images_json
+
+                    order_details.append({
+                        'order_id': item.id,
+                        'fk_order_id': item.fk_order_id,
+                        'fk_product_id': item.fk_product_id,
+                        'order_date': item.order_date,
+                        'product_id': product.id,
+                        'product_name_en': product.product_name_en,
+                        'product_name_ar': product.product_name_ar,
+                        'product_desc_en': product.product_desc_en,
+                        'product_desc_ar': product.product_desc_ar,
+                        'unit_quantity': product.unit_quantity,
+                        'product_code': product.product_code,
+                        'product_barcode': product.produc_barcode,
+                        'other_title_en': product.other_title_en,
+                        'other_title_ar': product.other_title_ar, 
+                        'status': product.status,
+                        'fast_delivery': product.fast_delivery,
+                        'featured': product.featured,
+                        'fresh': product.fresh,
+                        'offer': product.offer,
+                        'product_cat_id': product.cat,
+                        'product_subcat_id': product.subcat,
+                        'cat_id': product.cat,
+                        'subcat_id': product.subcat,
+                        'product_stock': product_stock_json,
+                        'product_images': products_images_json
+                    })
+                    products_images_json = []
+                    products_stocks_json = []
+                return jsonify({'return': 'success', 'order_details': order_details})
+            else:
+                return jsonify({'return': 'error', 'message': 'No Order found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error getting order details : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+# @app.route('/order', methods=['DELETE'])
+# @token_required
+# def deleteAllOrder(jwt_current_user):
+#     if request.method == 'DELETE':
 #         try:
-#             data = request.get_json()
-#             get_cart = UserCart.query.filter_by(fk_user_id=jwt_current_user.id).all()
-#             if get_cart:
-#                 for item in get_cart:
-#                     order = UserOrders(
-#                         fk_user_id=jwt_current_user.id,
-#                         fk_product_id=item.fk_product_id,
-#                         fk_product_stock_id=item.fk_product_stock_id,
-#                         quantity=item.quantity,
-#                         status='pending',
-#                         created_at=datetime.now(),
-#                         modified_at=datetime.now()
-#                     )
-#                     db.session.add(order)
-#                     db.session.commit()
+#             get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id).all()
+#             if get_order:
+#                 for item in get_order:
 #                     db.session.delete(item)
 #                     db.session.commit()
-#                 return jsonify({'return': 'success', 'message': 'order placed'})
+#                 return jsonify({'return': 'success', 'message': 'Order deleted successfully'})
 #             else:
-#                 return jsonify({'return': 'error', 'message': 'cart is empty'})
+#                 return jsonify({'return': 'error', 'message': 'No Order found'})
 #         except Exception as e:
-#             return jsonify({'return': 'error', 'message': 'error placing order : '+ str(e)})
+#             return jsonify({'return': 'error', 'message': 'error deleting order : '+ str(e)})
 #     else:
 #         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+# @app.route('/order/details', methods=['DELETE'])
+# @token_required
+# def deleteAllOrderDetails(jwt_current_user):
+#     if request.method == 'DELETE':
+#         try:
+#             get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id).all()
+#             if get_order:
+#                 for item in get_order:
+#                     get_order_details = OrderDetails.query.filter_by(fk_order_id=item.id).all()
+#                     for item in get_order_details:
+#                         db.session.delete(item)
+#                         db.session.commit()
+#                 return jsonify({'return': 'success', 'message': 'Order deleted successfully'})
+#             else:
+#                 return jsonify({'return': 'error', 'message': 'No Order found'})
+#         except Exception as e:
+#             return jsonify({'return': 'error', 'message': 'error deleting order : '+ str(e)})
+#     else:
+#         return jsonify({'return': 'error', 'message': 'method not allowed'})
+    
+
+# @app.route('/order/<id>', methods=['PUT'])
+# @token_required
+# def updateOrder(jwt_current_user, id):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## ------------------------------------------------------------------- APIs ------------------------------------------------------------------- ##
@@ -1384,7 +1663,8 @@ def login():
             if check_password_hash(user.password, password):
                 login_user(user)
                 return redirect(url_for('index'))
-        return 'Invalid username or password'
+        flash('Invalid username or password')
+        return render_template('login.html')
     return render_template('login.html')
 
 @app.route('/logout')

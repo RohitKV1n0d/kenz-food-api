@@ -41,6 +41,13 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                     </div>
+                                    {% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                           <p style="color: red;">{{ message }}</p> 
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% endwith %}
                                     <form class="user" method="POST">
                                         <div class="form-group">
                                             <input type="text" class="form-control form-control-user"
@@ -62,6 +69,7 @@
                                         <button type="submit"  class="btn btn-primary btn-user btn-block">Login</button>
                                         
                                     </form>
+                                    
                                     <hr>
                                     <div class="text-center">
                                         <a class="small" href="forgot-password.html">Forgot Password?</a>

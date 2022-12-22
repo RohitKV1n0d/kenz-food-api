@@ -84,7 +84,7 @@
                                         <td>{{product.unit_quantity}}</td>
                                         {% for stocks in prod_stock %}
                                             {% if stocks.fk_product_id == product.id %}
-                                                <td>{{stocks.product_price}}</td>
+                                                <td>{{stocks.product_price}} QR</td>
                                                 <td>{{stocks.product_offer_price}}</td>
                                                 <td>{{stocks.product_purchase_price}}</td>
                                                 <td>{{stocks.opening_stock}}</td>

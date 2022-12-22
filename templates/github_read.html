@@ -807,7 +807,201 @@
 
 
 
+<h2>Order APIs</h2>
+
+<h3>Place Order</h3>
+<ul>
+    <p>Place an order, all items in cart will be deleted and moved to order</p>
+    <p>URL: /order</p>
+    <p>Method : POST</p>
+    <p>Parameters : </p>
+    <p>Example : http://kenz-food-api.herokuapp.com/order</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "order placed",
+        "return": "success"
+    }
+</ul>
+
+<h3>Get all Orders</h3>
+<ul>
+    <p>Get all orders</p>
+    <p>URL: /order</p>
+    <p>Method : GET</p>
+    <p>Parameters : </p>
+    <p>Example : http://kenz-food-api.herokuapp.com/order</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "orders": [
+            {
+                "created_at": "Thu, 22 Dec 2022 16:08:36 GMT",
+                "id": 1,
+                "modified_at": "Thu, 22 Dec 2022 16:08:36 GMT",
+                "status": "cancelled",
+                "total_price": "22500",
+                "total_quantity": "3"
+            },
+            {
+                "created_at": "Thu, 22 Dec 2022 16:09:51 GMT",
+                "id": 2,
+                "modified_at": "Thu, 22 Dec 2022 16:09:51 GMT",
+                "status": "pending",
+                "total_price": "35000",
+                "total_quantity": "4"
+            },
+            {
+                "created_at": "Thu, 22 Dec 2022 18:17:58 GMT",
+                "id": 3,
+                "modified_at": "Thu, 22 Dec 2022 18:17:58 GMT",
+                "status": "pending",
+                "total_price": "15000",
+                "total_quantity": "2"
+            }
+        ],
+        "return": "success"
+    }
+</ul>
+
+<h3>Get specific Order</h3>
+<ul>
+    <p>Get a specific order with order id</p>
+    <p>URL: /order/{order_id}</p>
+    <p>Method : GET</p>
+    <p>Parameters : order_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/order/1</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "data": {
+            "id": 1,
+            "order_date": "Sun, 18 Dec 2022 04:05:54 GMT",
+            "order_no": "ORD-1",
+            "order_status": "pending",
+            "order_total": "123",
+            "user_id": 1
+        },
+        "message": "order fetched",
+        "return": "success"
+    }
+</ul>
+
+
+<h3>Get all Order items</h3>
+<ul>
+    <p>Get all items in a specific order with order id</p>
+    <p>URL: /order/details/{order_id}</p>
+    <p>Method : GET</p>
+    <p>Parameters : order_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/order/details/1</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "order_details": [
+            {
+                "cat_id": 1,
+                "fast_delivery": null,
+                "featured": null,
+                "fk_order_id": 2,
+                "fk_product_id": 3,
+                "fresh": null,
+                "offer": null,
+                "order_date": "Thu, 22 Dec 2022 16:09:51 GMT",
+                "order_id": 11,
+                "other_title_ar": null,
+                "other_title_en": null,
+                "product_barcode": null,
+                "product_cat_id": 1,
+                "product_code": null,
+                "product_desc_ar": "849",
+                "product_desc_en": "9849",
+                "product_id": 3,
+                "product_images": [
+                    {
+                        "id": 7,
+                        "product_id": 3,
+                        "product_image_url": "https://i.imgur.com/fsKa5Xh.jpg"
+                    },
+                    {
+                        "id": 8,
+                        "product_id": 3,
+                        "product_image_url": "https://i.imgur.com/PdnR6Qu.jpg"
+                    },
+                    {
+                        "id": 9,
+                        "product_id": 3,
+                        "product_image_url": "https://i.imgur.com/Hh39YnI.jpg"
+                    }
+                ],
+                "product_name_ar": "454984",
+                "product_name_en": "p3",
+                "product_stock": {
+                    "id": 3,
+                    "main_rack_no": null,
+                    "max_stock": "4",
+                    "min_stock": "498",
+                    "opening_stock": "98",
+                    "product_id": 3,
+                    "product_offer_price": "984",
+                    "product_price": "1500",
+                    "product_purchase_price": "984",
+                    "sub_rack_no": null
+                },
+                "product_subcat_id": 1,
+                "status": null,
+                "subcat_id": 1,
+                "unit_quantity": "84"
+            },
+            {
+                "cat_id": 1,
+                .
+                .
+                .
+                .
+                .
+                .
+                .
+                .
+                "status": null,
+                "subcat_id": 1,
+                "unit_quantity": "123"
+            },
+            {
+                "cat_id": 1,
+                .
+                .
+                .
+                .
+                .
+                .
+                .
+                .
+                "status": null,
+                "subcat_id": 1,
+                "unit_quantity": "651"
+            }
+        ],
+        "return": "success"
+    }
+</ul>
     
-    
-    
-    
+<h3>Cancel Order</h3>
+<ul>
+    <p>Cancel a specific order with order id</p>
+    <p>URL: /order/{order_id}</p>
+    <p>Method : DELETE</p>
+    <p>Parameters : order_id</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/order/1</p>
+
+    Response Body: JSON Object
+    Example:
+    {
+        "message": "order cancelled",
+        "return": "success"
+    }
+</ul>
