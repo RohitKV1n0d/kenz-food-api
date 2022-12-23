@@ -812,10 +812,10 @@
 <h3>Place Order</h3>
 <ul>
     <p>Place an order, all items in cart will be deleted and moved to order</p>
-    <p>URL: /order</p>
+    <p>URL: /order/{user_addr_id}</p>
     <p>Method : POST</p>
     <p>Parameters : </p>
-    <p>Example : http://kenz-food-api.herokuapp.com/order</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/order/1</p>
 
     Response Body: JSON Object
     Example:
@@ -838,6 +838,7 @@
     {
         "orders": [
             {
+                "address_id": 1,
                 "created_at": "Thu, 22 Dec 2022 16:08:36 GMT",
                 "id": 1,
                 "modified_at": "Thu, 22 Dec 2022 16:08:36 GMT",
@@ -846,6 +847,7 @@
                 "total_quantity": "3"
             },
             {
+                "address_id": 1,
                 "created_at": "Thu, 22 Dec 2022 16:09:51 GMT",
                 "id": 2,
                 "modified_at": "Thu, 22 Dec 2022 16:09:51 GMT",
@@ -854,6 +856,7 @@
                 "total_quantity": "4"
             },
             {
+                "address_id": 1,
                 "created_at": "Thu, 22 Dec 2022 18:17:58 GMT",
                 "id": 3,
                 "modified_at": "Thu, 22 Dec 2022 18:17:58 GMT",
@@ -909,6 +912,8 @@
                 "featured": null,
                 "fk_order_id": 2,
                 "fk_product_id": 3,
+                "address_id": 1,
+                "item_quantity":"5";
                 "fresh": null,
                 "offer": null,
                 "order_date": "Thu, 22 Dec 2022 16:09:51 GMT",
