@@ -250,6 +250,7 @@ class UserAddress(db.Model):
     modified_at = db.Column(db.DateTime, nullable=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
 
 class UserWhishlist(db.Model):
     __tablename__ = 'userwhishlist'
@@ -280,6 +281,7 @@ class Order(db.Model):
     total_quantity = db.Column(db.String(100), nullable=False)
     total_price = db.Column(db.String(100), nullable=False)
     # payment_method = db.Column(db.String(100), nullable=False)
+    address_id = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, nullable=True)
     modified_at = db.Column(db.DateTime, nullable=True)
@@ -1357,9 +1359,9 @@ def checkWishlist(jwt_current_user, product_id):
 
 
 
-@app.route('/order', methods=['POST'])
+@app.route('/order/<addr_id>', methods=['POST'])
 @token_required
-def cartToOrder(jwt_current_user):
+def cartToOrder(jwt_current_user, addr_id):
     if request.method == 'POST':
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id).all()
@@ -1377,6 +1379,7 @@ def cartToOrder(jwt_current_user):
                     fk_user_id=jwt_current_user.id,
                     total_price=total_price,
                     total_quantity=total_quantity,
+                    address_id=addr_id,
                     # payment_method= get_cart,
                     status='pending',
                     created_at=datetime.datetime.now(),
@@ -1425,6 +1428,7 @@ def getOrders(jwt_current_user):
                         'id': item.id,
                         'total_price': item.total_price,
                         'total_quantity': item.total_quantity,
+                        'address_id': item.address_id,
                         'status': item.status,
                         'created_at': item.created_at,
                         'modified_at': item.modified_at
@@ -1449,6 +1453,7 @@ def getOrderDetails(jwt_current_user, order_id):
                         'id': get_order.id,
                         'total_price': get_order.total_price,
                         'total_quantity': get_order.total_quantity,
+                        'address_id': get_order.address_id,
                         'status': get_order.status,
                         'created_at': get_order.created_at,
                         'modified_at': get_order.modified_at
@@ -1521,6 +1526,7 @@ def getOrderDetailsWithProduct(jwt_current_user, order_id):
                 order_details = []
                 products_images_json = []
                 products_stocks_json = []
+
                 for item in get_order_details:
                     product = Products.query.filter_by(id=item.fk_product_id).first()
                     get_product_stocks = ProductStock.query.filter_by(fk_product_id=product.id).all()
@@ -1553,6 +1559,8 @@ def getOrderDetailsWithProduct(jwt_current_user, order_id):
                         'order_id': item.id,
                         'fk_order_id': item.fk_order_id,
                         'fk_product_id': item.fk_product_id,
+                        'item_quantity': item.item_quantity,
+                        'address_id': get_order.address_id,
                         'order_date': item.order_date,
                         'product_id': product.id,
                         'product_name_en': product.product_name_en,
