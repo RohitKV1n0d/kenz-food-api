@@ -12,8 +12,8 @@
        
         Example Input body:
         {
-            "email" : "rohitvinod92@gmail.com",
-            "password" : "rkv123"
+            "email" : "admin@test.com",
+            "password" : "test123"
         }
 
         Example Response body:
