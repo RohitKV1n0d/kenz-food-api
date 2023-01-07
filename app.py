@@ -2152,6 +2152,8 @@ def deleteBanner(id):
     except Exception as e:
         return jsonify({'return': 'error deleting banner :- '+str(e)})
 
+
+
 @app.route('/termsandconditions')
 def termsandconditions():
     return render_template('Terms-and-Conditions-for-Kenz-Food.html')
@@ -2159,3 +2161,4 @@ def termsandconditions():
 @app.route('/privacypolicy')
 def privacypolicy():   
     return render_template('Privacy-Policy-for-Kenz-Food.html')
+
