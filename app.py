@@ -2151,3 +2151,14 @@ def deleteBanner(id):
         return redirect(url_for('viewBanner'))
     except Exception as e:
         return jsonify({'return': 'error deleting banner :- '+str(e)})
+
+
+
+@app.route('/termsandconditions')
+def termsandconditions():
+    return render_template('Terms-and-Conditions-for-Kenz-Food.html')
+
+@app.route('/privacypolicy')
+def privacypolicy():   
+    return render_template('Privacy-Policy-for-Kenz-Food.html')
+
