@@ -277,6 +277,7 @@
 </ul>
 
 
+
 <h2>Banner API</h2>
 
 <h3>Get all Banners</h3>
@@ -323,6 +324,35 @@
             }
         ],
         "message": "banner fetched",
+        "return": "success"
+    }
+</ul>
+
+<h3>Get all Notifications </h3>
+<ul>
+    <p>Get all data from notification table</p>
+    <p>URL: /notifications</p>
+    <p>Method : GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/notifications</p>
+    
+    Response Body: JSON Object
+    Example:
+    {
+        "data": [
+            {
+                "id": 1,
+                "image_url": "https://i.imgur.com/mtzqSXZ.png",
+                "message": "qwe",
+                "title": "qwe"
+            },
+            {
+                "id": 2,
+                "image_url": "https://i.imgur.com/hiNtk1w.png",
+                "message": "qweqwe",
+                "title": "wqe"
+            }
+        ],
+        "message": "notifications fetched",
         "return": "success"
     }
 </ul>
@@ -427,6 +457,65 @@
 </ul>
 
 <h2>Product APIs</h2>
+
+<h3>Get all Products by search</h3>
+<ul>
+    <p>Get all products data by search query</p>
+    <p>URL: /get_products</p>
+    <p>Method : GET</p>
+    <p>PARAM : search </p>
+    <p>Example : http://kenz-food-api.herokuapp.com/get_products?search=chicken</p>
+    
+    Response Body: JSON Object
+    Example:
+    {
+        "products": [
+            {
+                "cat_id": 2,
+                "fast_delivery": null,
+                "featured": null,
+                "fresh": null,
+                "id": 10,
+                "offer": null,
+                "other_title_ar": null,
+                "other_title_en": null,
+                "product_barcode": null,
+                "product_cat_id": 2,
+                "product_code": null,
+                "product_desc_ar": "asdasdasd",
+                "product_desc_en": "chicken biriyani",
+                "product_images": [
+                    {
+                        "id": 42,
+                        "product_id": 10,
+                        "product_image_url": "https://i.imgur.com/rFpmw8C.jpg"
+                    }
+                ],
+                "product_name_ar": "asd",
+                "product_name_en": "chicken biriyani",
+                "product_stock": [
+                    {
+                        "id": 24,
+                        "main_rack_no": null,
+                        "max_stock": "",
+                        "min_stock": "",
+                        "opening_stock": "",
+                        "product_id": 10,
+                        "product_offer_price": "asd",
+                        "product_price": "dasd",
+                        "product_purchase_price": "asd",
+                        "sub_rack_no": null
+                    }
+                ],
+                "product_subcat_id": 2,
+                "status": null,
+                "subcat_id": 2,
+                "unit_quantity": "dasdasd"
+            }
+        ],
+        "return": "success" }
+</ul>
+
 
 <h3>Get Product images by ID</h3>
 <ul>

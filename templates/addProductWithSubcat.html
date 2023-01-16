@@ -92,31 +92,140 @@
                 </div>
                 <ul id="preview"></ul>
                 </div>
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Product Price</label>
+                            <input type="number" class="form-control" id="product_price" rows="4" cols="50"
+                                name="product_price" placeholder="Enter Product Price" required>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Product Offer Price</label>
+                            <input type="number" class="form-control" id="product_offer_price" rows="4" cols="50"
+                                name="product_offer_price" placeholder="Enter Product Offer Price" required>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Product Purchase Price</label>
+                            <input type="number" class="form-control" id="product_purchase_price" rows="4" cols="50"
+                                name="product_purchase_price" placeholder="Enter Product Purchase Price " required>
+                        </div>
+                    </div>
+                </div>
 
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Opening stock</label>
+                            <input type="number" class="form-control" id="opening_stock" rows="4" cols="50"
+                                name="opening_stock" placeholder="Enter Opening stock" required>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Min Quantity</label>
+                            <input type="number" class="form-control" id="min_stock" rows="4" cols="50" name="min_stock"
+                                placeholder="Enter Min Quantity" required>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Max Quantity</label>
+                            <input type="number" class="form-control" id="max_stock" rows="4" cols="50" name="max_stock"
+                                placeholder="Enter Max Quantity" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Product Code</label>
+                            <input type="text" class="form-control" id="product_code" name="product_code"
+                                placeholder="Enter Product code" required>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="categoryName">Product Barcode</label>
+                            <input type="text" class="form-control" id="product_barcode" name="product_barcode"
+                                placeholder="Enter Product Barcode" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="categoryName">Product Other Title</label>
+                            <input type="text" class="form-control" id="other_title_en" name="other_title_en"
+                                placeholder="Enter Product code" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="categoryName">Product Other Title(Arabic)</label>
+                            <input type="text" class="form-control" id="other_title_ar" name="other_title_ar"
+                                placeholder="Enter Product code" required>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label for="categoryName">Product Price</label>
-                    <input type="number" class="form-control" id="product_price" rows="4" cols="50" name="product_price" placeholder="Enter Product Price" required>
-                </div> 
+                    <label for="categoryName">Product Othrer Discription</label>
+                    <textarea type="text" class="form-control" rows="4" cols="50" id="other_desc_en"
+                        name="other_desc_en" placeholder="Enter Product Discription" required></textarea>
+
+                </div>
                 <div class="form-group">
-                    <label for="categoryName">Product Offer Price</label>
-                    <input type="number" class="form-control" id="product_offer_price" rows="4" cols="50" name="product_offer_price" placeholder="Enter Product Offer Price" required>
-                </div> 
-                <div class="form-group">
-                    <label for="categoryName">Product Purchase Price</label>
-                    <input type="number" class="form-control" id="product_purchase_price" rows="4" cols="50" name="product_purchase_price" placeholder="Enter Product Purchase Price " required>
-                </div> 
-                <div class="form-group">
-                    <label for="categoryName">Opening stock</label>
-                    <input type="number" class="form-control" id="opening_stock" rows="4" cols="50" name="opening_stock" placeholder="Enter Opening stock" required>
-                </div> 
-                <div class="form-group">
-                    <label for="categoryName">Min Quantity</label>
-                    <input type="number" class="form-control" id="min_stock" rows="4" cols="50" name="min_stock" placeholder="Enter Min Quantity" required>
-                </div> 
-                <div class="form-group">
-                    <label for="categoryName">Max Quantity</label>
-                    <input type="number" class="form-control" id="max_stock" rows="4" cols="50" name="max_stock" placeholder="Enter Max Quantity" required>
-                </div> 
+                    <label for="categoryName">Product Other Discription(Arabic)</label>
+                    <textarea type="text" class="form-control" id="other_desc_ar" rows="4" cols="50"
+                        name="other_desc_ar" placeholder="Enter Product Discription(Arabic)" required></textarea>
+                </div>
+                <div class="row" style="margin-bottom: 2em;">
+                    <div class="col-sm">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="is_active" name="status" checked>
+
+                            <label class="custom-control-label" for="is_active">Status</label>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="is_active_fast_delivery"  name="fast_delivery" >
+
+                            <label class="custom-control-label" for="is_active_fast_delivery">Fast delivery</label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="is_active_featured" name="featured" >
+
+                            <label class="custom-control-label" for="is_active_featured">Featured</label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="is_active_fresh" name="fresh" >
+
+                            <label class="custom-control-label" for="is_active_fresh">Fresh</label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="is_active_offer" name="offer" >
+                            <label class="custom-control-label" for="is_active_offer">Offer</label>
+                        </div>
+                    </div>
+
+                </div>
+
 
 
                

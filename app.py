@@ -102,7 +102,6 @@ class Users(db.Model, UserMixin):
     user_whishlist_br = db.relationship('UserWhishlist', backref='user_whishlist_br')
     user_cart_br = db.relationship('CartItem', backref='user_cart_br')
     order_br = db.relationship('Order', backref='order_br')
-    notifications = db.relationship('Notifications', backref='notifications')
     # order_details_br = db.relationship('OrderDetails', backref='order_details_br')
     # payment_details_br = db.relationship('PaymentDetails', backref='payment_details_br')
 
@@ -112,12 +111,10 @@ class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     message = db.Column(db.String(100), nullable=False)
-    notification_type = db.Column(db.String(100), nullable=False)
     notification_image = db.Column(db.String(100), nullable=True)
     notification_url = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.String(100), nullable=True)
-    status = db.Column(db.Boolean, nullable=True, default=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    # status = db.Column(db.Boolean, nullable=True, default=False)
 
 
 
@@ -761,6 +758,31 @@ def secondary_banner():
         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
 
+@app.route('/notifications', methods=['GET'])
+def notifications():
+    if request.method == 'GET':
+        try:
+            get_notifications = Notifications.query.all()
+            if get_notifications:
+                notifications = []
+                for item in get_notifications:
+                    notifications.append({
+                        'id': item.id,
+                        'title': item.title,
+                        'message': item.message,
+                        'image_url': item.notification_image,
+                    })
+                return jsonify({'return': 'success', 'message': 'notifications fetched', 'data': notifications})
+            else:
+                return jsonify({'return': 'error', 'message': 'notifications not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching notifications : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+
+
 @app.route('/get_categories', methods=['GET'])
 def get_categories():
     if request.method == 'GET':
@@ -1073,6 +1095,81 @@ def get_product():
                 return jsonify({'return': 'error getting products : '+ str(e)})
 
 
+
+
+@app.route('/products', methods=['GET'])
+def search_products():
+    if request.method == 'GET':
+        key = request.args.get('search')
+
+        try:
+            get_products = Products.query.filter(Products.product_name_en.like('%'+key+'%')).all()
+            if get_products:
+                products_json = []
+                products_stocks_json = []
+                products_images_json = []
+                for product in get_products: 
+                    product_json = {
+                        'id': product.id,
+                        'product_name_en': product.product_name_en,
+                        'product_name_ar': product.product_name_ar,
+                        'product_desc_en': product.product_desc_en,
+                        'product_desc_ar': product.product_desc_ar,
+                        'unit_quantity': product.unit_quantity,
+                        'product_code': product.product_code,
+                        'product_barcode': product.produc_barcode,
+                        'other_title_en': product.other_title_en,
+                        'other_title_ar': product.other_title_ar, 
+                        'status': product.status,
+                        'fast_delivery': product.fast_delivery,
+                        'featured': product.featured,
+                        'fresh': product.fresh,
+                        'offer': product.offer,
+                        'product_cat_id': product.cat,
+                        'product_subcat_id': product.subcat,
+                        'cat_id': product.cat,
+                        'subcat_id': product.subcat,
+                        'product_stock': [],
+                        'product_images': []
+                        # 'product_price': product.product_stock,
+                    }
+                    for product_stock in product.product_stock:
+                        product_stock_json = {
+                            'id': product_stock.id,
+                            'product_price': product_stock.product_price,
+                            'product_offer_price': product_stock.product_offer_price,
+                            'product_purchase_price': product_stock.product_purchase_price,
+                            'opening_stock': product_stock.opening_stock,
+                            'min_stock': product_stock.min_stock,
+                            'max_stock': product_stock.max_stock,
+                            'main_rack_no': product_stock.main_rack_no,
+                            'sub_rack_no': product_stock.sub_rack_no,
+                            'product_id': product_stock.fk_product_id,
+                        }
+                        products_stocks_json.append(product_stock_json)
+                        product_json['product_stock'] = products_stocks_json
+                    for product_image in product.product_image:
+                        product_image_json = {
+                            'id': product_image.id,
+                            'product_image_url': product_image.product_image_url,
+                            'product_id': product_image.fk_product_id,
+                        }
+                        products_images_json.append(product_image_json)
+                        product_json['product_images'] = products_images_json
+
+                    products_images_json = []
+                    products_stocks_json = []
+                    products_json.append(product_json)
+                return jsonify({'return': 'success', 'products': products_json})
+            else:
+                return jsonify({'return': 'no products'})
+        except Exception as e:
+            return jsonify({'return': 'error getting products : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'invalid request method'})
+        
+
+
 @app.route('/changeProductStatus/<status>')
 def changeProductStatus(status):
     if request.method == 'GET':
@@ -1091,6 +1188,215 @@ def changeProductStatus(status):
             return jsonify({'return': 'error', 'message': 'error changing product status : '+ str(e)})
     else:
         return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+
+@app.route('/get_products/fast_delivery', methods=['GET'])
+def get_fast_delivery_products():
+    if request.method == 'GET':
+        try:
+            get_products = Products.query.filter_by(fast_delivery='yes').all()
+            if get_products:
+                products_json = []
+                products_stocks_json = []
+                products_images_json = []
+                for product in get_products: 
+                    product_json = {
+                        'id': product.id,
+                        'product_name_en': product.product_name_en,
+                        'product_name_ar': product.product_name_ar,
+                        'product_desc_en': product.product_desc_en,
+                        'product_desc_ar': product.product_desc_ar,
+                        'unit_quantity': product.unit_quantity,
+                        'product_code': product.product_code,
+                        'product_barcode': product.produc_barcode,
+                        'other_title_en': product.other_title_en,
+                        'other_title_ar': product.other_title_ar, 
+                        'status': product.status,
+                        'fast_delivery': product.fast_delivery,
+                        'featured': product.featured,
+                        'fresh': product.fresh,
+                        'offer': product.offer,
+                        'product_cat_id': product.cat,
+                        'product_subcat_id': product.subcat,
+                        'cat_id': product.cat,
+                        'subcat_id': product.subcat,
+                        'product_stock': [],
+                        'product_images': []
+                        # 'product_price': product.product_stock,
+                    }
+                    for product_stock in product.product_stock:
+                        product_stock_json = {
+                            'id': product_stock.id,
+                            'product_price': product_stock.product_price,
+                            'product_offer_price': product_stock.product_offer_price,
+                            'product_purchase_price': product_stock.product_purchase_price,
+                            'opening_stock': product_stock.opening_stock,
+                            'min_stock': product_stock.min_stock,
+                            'max_stock': product_stock.max_stock,
+                            'main_rack_no': product_stock.main_rack_no,
+                            'sub_rack_no': product_stock.sub_rack_no,
+                            'product_id': product_stock.fk_product_id,
+                        }
+                        products_stocks_json.append(product_stock_json)
+                        product_json['product_stock'] = products_stocks_json
+                    for product_image in product.product_image:
+                        product_image_json = {
+                            'id': product_image.id,
+                            'product_image_url': product_image.product_image_url,
+                            'product_id': product_image.fk_product_id,
+                        }
+                        products_images_json.append(product_image_json)
+                        product_json['product_images'] = products_images_json
+
+                    products_images_json = []
+                    products_stocks_json = []
+                    products_json.append(product_json)
+                return jsonify({'return': 'success', 'products': products_json})
+            else:
+                return jsonify({'return': 'no products'})
+        except Exception as e:
+            return jsonify({'return': 'error getting products : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+@app.route('/get_products/normal_delivery', methods=['GET'])
+def get_normal_delivery_products():
+    if request.method == 'GET':
+        try:
+            get_products = Products.query.filter_by(fast_delivery='no').all()
+            if get_products:
+                products_json = []
+                products_stocks_json = []
+                products_images_json = []
+                for product in get_products: 
+                    product_json = {
+                        'id': product.id,
+                        'product_name_en': product.product_name_en,
+                        'product_name_ar': product.product_name_ar,
+                        'product_desc_en': product.product_desc_en,
+                        'product_desc_ar': product.product_desc_ar,
+                        'unit_quantity': product.unit_quantity,
+                        'product_code': product.product_code,
+                        'product_barcode': product.produc_barcode,
+                        'other_title_en': product.other_title_en,
+                        'other_title_ar': product.other_title_ar, 
+                        'status': product.status,
+                        'fast_delivery': product.fast_delivery,
+                        'featured': product.featured,
+                        'fresh': product.fresh,
+                        'offer': product.offer,
+                        'product_cat_id': product.cat,
+                        'product_subcat_id': product.subcat,
+                        'cat_id': product.cat,
+                        'subcat_id': product.subcat,
+                        'product_stock': [],
+                        'product_images': []
+                        # 'product_price': product.product_stock,
+                    }
+                    for product_stock in product.product_stock:
+                        product_stock_json = {
+                            'id': product_stock.id,
+                            'product_price': product_stock.product_price,
+                            'product_offer_price': product_stock.product_offer_price,
+                            'product_purchase_price': product_stock.product_purchase_price,
+                            'opening_stock': product_stock.opening_stock,
+                            'min_stock': product_stock.min_stock,
+                            'max_stock': product_stock.max_stock,
+                            'main_rack_no': product_stock.main_rack_no,
+                            'sub_rack_no': product_stock.sub_rack_no,
+                            'product_id': product_stock.fk_product_id,
+                        }
+                        products_stocks_json.append(product_stock_json)
+                        product_json['product_stock'] = products_stocks_json
+                    for product_image in product.product_image:
+                        product_image_json = {
+                            'id': product_image.id,
+                            'product_image_url': product_image.product_image_url,
+                            'product_id': product_image.fk_product_id,
+                        }
+                        products_images_json.append(product_image_json)
+                        product_json['product_images'] = products_images_json
+
+                    products_images_json = []
+                    products_stocks_json = []
+                    products_json.append(product_json)
+                return jsonify({'return': 'success', 'products': products_json})
+            else:
+                return jsonify({'return': 'no products'})
+        except Exception as e:
+            return jsonify({'return': 'error getting products : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
+@app.route('/get_products/featured', methods=['GET'])
+def get_featured_products():
+    if request.method == 'GET':
+        try:
+            get_products = Products.query.filter_by(featured='yes').all()
+            if get_products:
+                products_json = []
+                products_stocks_json = []
+                products_images_json = []
+                for product in get_products: 
+                    product_json = {
+                        'id': product.id,
+                        'product_name_en': product.product_name_en,
+                        'product_name_ar': product.product_name_ar,
+                        'product_desc_en': product.product_desc_en,
+                        'product_desc_ar': product.product_desc_ar,
+                        'unit_quantity': product.unit_quantity,
+                        'product_code': product.product_code,
+                        'product_barcode': product.produc_barcode,
+                        'other_title_en': product.other_title_en,
+                        'other_title_ar': product.other_title_ar, 
+                        'status': product.status,
+                        'fast_delivery': product.fast_delivery,
+                        'featured': product.featured,
+                        'fresh': product.fresh,
+                        'offer': product.offer,
+                        'product_cat_id': product.cat,
+                        'product_subcat_id': product.subcat,
+                        'cat_id': product.cat,
+                        'subcat_id': product.subcat,
+                        'product_stock': [],
+                        'product_images': []
+                        # 'product_price': product.product_stock,
+                    }
+                    for product_stock in product.product_stock:
+                        product_stock_json = {
+                            'id': product_stock.id,
+                            'product_price': product_stock.product_price,
+                            'product_offer_price': product_stock.product_offer_price,
+                            'product_purchase_price': product_stock.product_purchase_price,
+                            'opening_stock': product_stock.opening_stock,
+                            'min_stock': product_stock.min_stock,
+                            'max_stock': product_stock.max_stock,
+                            'main_rack_no': product_stock.main_rack_no,
+                            'sub_rack_no': product_stock.sub_rack_no,
+                            'product_id': product_stock.fk_product_id,
+                        }
+                        products_stocks_json.append(product_stock_json)
+                        product_json['product_stock'] = products_stocks_json
+                    for product_image in product.product_image:
+                        product_image_json = {
+                            'id': product_image.id,
+                            'product_image_url': product_image.product_image_url,
+                            'product_id': product_image.fk_product_id,
+                        }
+                        products_images_json.append(product_image_json)
+                        product_json['product_images'] = products_images_json
+
+                    products_images_json = []
+                    products_stocks_json = []
+                    products_json.append(product_json)
+                return jsonify({'return': 'success', 'products': products_json})
+            else:
+                return jsonify({'return': 'no products'})
+        except Exception as e:
+            return jsonify({'return': 'error getting products : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
+
 
 
 
@@ -1955,11 +2261,16 @@ def addProductWithSubcat(subcat_id):
     addSubcat = ProductSubCategory.query.get_or_404(subcat_id)
     addCat = ProductCategory.query.get_or_404(addSubcat.fk_prod_cat_id)
 
-          
+    def status(stat):
+        if str(stat) == 'on':
+            return "1"
+        else:
+            return "0"
+        
         
 
     if request.method == 'POST':
-        try: 
+      
             with app.app_context():
         
                 prod = Products(
@@ -1969,6 +2280,17 @@ def addProductWithSubcat(subcat_id):
                     product_desc_ar=request.form['product_desc_ar'],
                     unit_id=request.form['unit'],
                     unit_quantity=request.form['unit_quantity'],
+                    product_code=request.form['product_code'],
+                    produc_barcode=request.form['product_barcode'],
+                    other_title_en=request.form['other_title_en'],
+                    other_title_ar=request.form['other_title_ar'],
+                    other_desc_en=request.form['other_desc_en'],
+                    other_desc_ar=request.form['other_desc_ar'],
+                    status=status(request.form.get('status')),
+                    fast_delivery =status(request.form.get('fast_delivery')),
+                    featured=status(request.form.get('featured')),
+                    fresh=status(request.form.get('fresh')),
+                    offer=status(request.form.get('offer')),
                     cat=addCat.id,
                     subcat=addSubcat.id
                 )
@@ -2000,8 +2322,7 @@ def addProductWithSubcat(subcat_id):
 
 
             return redirect(url_for('viewSubcatOnlyProducts', id=addSubcat.id))
-        except Exception as e:
-            return jsonify({'return': 'error adding product :- '+str(e)})
+        
     return render_template('addProductWithSubcat.html', 
                             category=category, 
                             subcategory=subcategory,
@@ -2029,7 +2350,11 @@ def addProduct():
                 opt[cat.id] = subcat
             subcat= [[],[]]
          
-          
+    def status(stat):
+        if str(stat) == 'on':
+            return 1
+        else:
+            return 0
         
 
     if request.method == 'POST':
@@ -2043,6 +2368,17 @@ def addProduct():
                     product_desc_ar=request.form['product_desc_ar'],
                     unit_id=request.form['unit'],
                     unit_quantity=request.form['unit_quantity'],
+                    product_code=request.form['product_code'],
+                    produc_barcode=request.form['product_barcode'],
+                    other_title_en=request.form['other_title_en'],
+                    other_title_ar=request.form['other_title_ar'],
+                    other_desc_en=request.form['other_desc_en'],
+                    other_desc_ar=request.form['other_desc_ar'],
+                    status=status(request.form.get('status')),
+                    fast_delivery =status(request.form.get('fast_delivery')),
+                    featured=status(request.form.get('featured')),
+                    fresh=status(request.form.get('fresh')),
+                    offer=status(request.form.get('offer')),
                     cat=request.form['category'],
                     subcat=request.form['subcategory']
                 )
@@ -2152,6 +2488,8 @@ def deleteProduct(id):
         return redirect(url_for('viewProduct'))
     except Exception as e:
         return jsonify({'return': 'error deleting product :- '+str(e)})
+
+
 
 
 @app.route('/viewSubcatOnlyProducts/<id>', methods=['GET', 'POST'])
@@ -2317,5 +2655,43 @@ def deleteSecondaryBanner(id):
         return jsonify({'return': 'error deleting banner :- '+str(e)})
 
 
+@app.route('/notifications/add', methods=['GET', 'POST'])
+@login_required
+def addNotification():
+    notifications = Notifications.query.all()
+    if request.method == 'POST':
+        try:
+            with app.app_context():
+                img = request.files.get('notification_image')
+                img_filename = secure_filename(request.files['notification_image'].filename)
+                basedir = os.path.abspath(os.path.dirname(__file__))
+                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                notification = Notifications(title=request.form['title'],
+                    notification_image=upload_image.link,
+                    message=request.form['message'],
+                )
+                db.session.add(notification)
+                db.session.commit()
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            
+            return render_template('addNotifications.html', notifications=notifications)
+        except Exception as e:
+            return jsonify({'return': 'error adding notification :- '+str(e)})
+    return render_template('addNotifications.html', notifications=notifications)
 
-
+@app.route('/notifications/delete', methods=['GET', 'POST'])
+@login_required
+def deleteNotification():
+    notifications = Notifications.query.all()
+    if request.method == 'POST':
+        try:
+            with app.app_context():
+                notification = Notifications.query.get_or_404(request.form['id'])
+                db.session.delete(notification)
+                db.session.commit()
+            
+            return render_template('addNotifications.html', notifications=notifications)
+        except Exception as e:
+            return jsonify({'return': 'error deleting notification :- '+str(e)})
+    return render_template('addNotifications.html', notifications=notifications)
