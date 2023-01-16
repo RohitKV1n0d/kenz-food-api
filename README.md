@@ -18,7 +18,10 @@
 
         Example Response body:
         {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI4Yzk2MmI0Mi04ZTI0LTRhYjMtOTI4Ny02M2Y0OTA2NjI4OTkiLCJleHAiOjE2NzEzMDkzNjl9.u3u2eBxvdloQttUOEi1SePQF9HjIU1rz7MSXnnjj3EY"
+            "is_verified": False,
+            "phone": "1234567890",
+            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiIzZmU3ZDlkOC1jZTlhLTRhNmQtOTIwZS0xYjA1ZGIwOTU3ZjMifQ.wMpnikIZzeCcV0sKcZ2LGkmnAoMpsmOKklYa8qV4110",
+            "user_id": 1
         }
 </ul>
 
@@ -202,6 +205,59 @@
         }
 
 </ul>
+
+
+<h3>Update user Password</h3>
+<ul>
+    <p>Update a password for a user</p>
+    <p>URL: /update_password/{id}</p>
+    <p>Method: PUT</p>
+    <p>URL Content-Type: JSON</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/update_password/1</p>
+    
+       
+        Example Input body:
+        {
+            'password': "admin123"
+        }
+
+</ul>
+
+
+<h3>Verify user</h3>
+<ul>
+    <p>Verify a user</p>
+    <p>URL: /verify/{id}</p>
+    <p>Method: PUT</p>
+    <p>URL Content-Type: JSON</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/verify/1</p>
+    
+       
+        Example Input body:
+        {
+            'verified_user': True
+        }
+
+</ul>
+
+
+<h3>Check user Verification</h3>
+<ul>
+    <p>Check a verification for a user</p>
+    <p>URL: /verify/{id}</p>
+    <p>Method: GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/verify/1</p>
+    
+       
+        Example Response body:
+        {
+            "return": "success",
+            "user_verification_status": False
+        }
+
+</ul>
+
+
 
 <h3>Delete User Address</h3>
 <ul>
