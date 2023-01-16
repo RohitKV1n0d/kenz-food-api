@@ -87,7 +87,7 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(100), nullable=False, unique=True)
     phone = db.Column(db.String(100), nullable=False, unique=True)
     profile_url = db.Column(db.String(100), nullable=True)
-    verified_user = db.Column(db.String(100), nullable=True)
+    verified_user = db.Column(db.Boolean, nullable=True , default=False)
     active_user = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.String(100), nullable=True)
     last_login = db.Column(db.String(100), nullable=True)
@@ -102,8 +102,25 @@ class Users(db.Model, UserMixin):
     user_whishlist_br = db.relationship('UserWhishlist', backref='user_whishlist_br')
     user_cart_br = db.relationship('CartItem', backref='user_cart_br')
     order_br = db.relationship('Order', backref='order_br')
+    notifications = db.relationship('Notifications', backref='notifications')
     # order_details_br = db.relationship('OrderDetails', backref='order_details_br')
     # payment_details_br = db.relationship('PaymentDetails', backref='payment_details_br')
+
+
+class Notifications(db.Model):
+    __tablename__ = 'notifications'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.String(100), nullable=False)
+    notification_type = db.Column(db.String(100), nullable=False)
+    notification_image = db.Column(db.String(100), nullable=True)
+    notification_url = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.String(100), nullable=True)
+    status = db.Column(db.Boolean, nullable=True, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+
+
 
 
 class BannerSection(db.Model):
@@ -116,6 +133,18 @@ class BannerSection(db.Model):
     banner_desc_en = db.Column(db.String(100), nullable=True)
     banner_desc_ar = db.Column(db.String(100), nullable=True)
     status = db.Column(db.String(100), nullable=True)
+
+class SecondaryBanner(db.Model):
+    __tablename__ = 'secondarybanner'
+    id = db.Column(db.Integer, primary_key=True)
+    banner_name_en = db.Column(db.String(100), nullable=False)
+    banner_name_ar = db.Column(db.String(100), nullable=True)
+    banner_order = db.Column(db.String(100), nullable=True)
+    banner_image_url = db.Column(db.String(100), nullable=False)
+    banner_desc_en = db.Column(db.String(100), nullable=True)
+    banner_desc_ar = db.Column(db.String(100), nullable=True)
+    status = db.Column(db.String(100), nullable=True)
+
 
 
 class ProductCategory(db.Model):
@@ -411,39 +440,12 @@ def sign_in():
             user.ip_address = request.remote_addr
             db.session.commit()
 
-            return jsonify({'token' : token.decode('UTF-8')}) 
+            return jsonify({'token' : token.decode('UTF-8'), 'user_id': user.id, 'phone' : user.phone, 'is_verified' : user.verified_user}) 
     
         return make_response('could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
     else:
         return jsonify({'return': 'no POST request'})
 
-# @app.route('/get_current_user', methods=['GET'])
-# def get_current_user():
-
-     
-#     if request.method == 'GET':
-#         if current_user.is_authenticated:
-#             return jsonify({
-#                     'return': 'success', 
-#                     'user': current_user.id,
-#                     'email': current_user.email,
-#                     'phone': current_user.phone,
-#                     # 'password': current_user.password,
-#                     'firstname': current_user.firstname,
-#                     'lastname': current_user.lastname,
-#                     'user_type': current_user.user_type,
-#                     'ip_address': current_user.ip_address,
-#                     'profile_url': current_user.profile_url,
-#                     'verified_user': current_user.verified_user,
-#                     'active_user': current_user.active_user,
-#                     'created_at': current_user.created_at,
-#                     'last_login': current_user.last_login,
-#                     'fcm_id': current_user.fcm_id,
-#                     'latitude': current_user.latitude,
-#                     'longitude': current_user.longitude
-#                     })
-#         else:
-#             return jsonify({'return': 'user not logged in'})
 
 
 
@@ -452,6 +454,46 @@ def sign_in():
 def sign_out():
     logout_user()
     return jsonify({'return': 'success'})
+
+@app.route('/update_password/<int:user_id>', methods=['PUT'])
+def update_password(user_id):
+    if request.method == 'PUT':
+        content = request.json
+        user = Users.query.filter_by(id=user_id).first()
+        if user:
+            user.password = generate_password_hash(content['password'], method='sha256')
+            db.session.commit()
+            return jsonify({'return': 'success'})
+        else:
+            return jsonify({'return': 'user not found'})
+    else:
+        return jsonify({'return': 'no POST request'})
+
+
+
+
+@app.route('/verify/<int:user_id>', methods=['GET'])
+def isVerified(user_id):
+    user = Users.query.filter_by(id=user_id).first()
+    if user:
+        return jsonify({'return': 'success', 'user_verification_status': user.verified_user})
+    else:
+        return jsonify({'return': 'user not found'})
+
+@app.route('/verify/<int:user_id>', methods=['PUT'])
+def verify(user_id):
+    if request.method == 'PUT':
+        user = Users.query.filter_by(id=user_id).first()
+        if user:
+            user.verified_user = True
+            db.session.commit()
+            return jsonify({'return': 'success'})
+        else:
+            return jsonify({'return': 'user not found'})
+    else:
+        return jsonify({'return': 'no PUT request'})
+
+
 
 
 @app.route('/get_users/<parm>', methods=['GET'])
@@ -677,6 +719,28 @@ def banner():
 
 
 
+@app.route('/secondary_banner', methods=['GET'])
+def secondary_banner():
+    if request.method == 'GET':
+        try:
+            get_banner = SecondaryBanner.query.all()
+            if get_banner:
+                banner = []
+                for item in get_banner:
+                    banner.append({
+                        'id': item.id,
+                        'banner_name_en': item.banner_name_en,
+                        'banner_image_url': item.banner_image_url,
+                        'status': item.status,
+                        'banner_desc_en': item.banner_desc_en
+                    })
+                return jsonify({'return': 'success', 'message': 'banner fetched', 'data': banner})
+            else:
+                return jsonify({'return': 'error', 'message': 'banner not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching banner : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
 
 
 @app.route('/get_categories', methods=['GET'])
@@ -2161,4 +2225,79 @@ def termsandconditions():
 @app.route('/privacypolicy')
 def privacypolicy():   
     return render_template('Privacy-Policy-for-Kenz-Food.html')
+
+
+
+@app.route('/addSecondaryBanner', methods=['GET', 'POST'])
+@login_required
+def addSecondaryBanner():
+    if request.method == 'POST':
+        try:
+            with app.app_context():
+                img = request.files.get('banner_image_url')
+                img_filename = secure_filename(request.files['banner_image_url'].filename)
+                basedir = os.path.abspath(os.path.dirname(__file__))
+                img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                banner = SecondaryBanner(banner_name_en=request.form['banner_name_en'],
+                    banner_image_url=upload_image.link,
+                    banner_desc_en=request.form['banner_desc_en'],
+                    # status=request.form['status']
+                )
+                db.session.add(banner)
+                db.session.commit()
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+            
+            return redirect(url_for('viewSecondaryBanner'))
+        except Exception as e:
+            return jsonify({'return': 'error adding banner :- '+str(e)})
+    return render_template('addSecondaryBanner.html')
+
+@app.route('/viewSecondaryBanner', methods=['GET', 'POST'])
+@login_required
+def viewSecondaryBanner():
+    banner = SecondaryBanner.query.all()
+    return render_template('viewSecondaryBanner.html', banner=banner)
+
+@app.route('/editSecondaryBanner/<id>', methods=['GET', 'POST'])
+@login_required
+def editSecondaryBanner(id):
+    banner = SecondaryBanner.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            with app.app_context():
+                img = request.files.get('banner_image_url')
+                img_filename = secure_filename(request.files['banner_image_url'].filename)
+                if img_filename != '':
+                    basedir = os.path.abspath(os.path.dirname(__file__))
+                    img.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                    upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                    banner.banner_image_url=upload_image.link
+                    os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                else:
+                    pass
+                banner.banner_name_en=request.form['banner_name_en']
+                banner.banner_desc_en=request.form['banner_desc_en']
+                # banner.status=request.form['status']
+                db.session.commit()
+                
+            
+            return redirect(url_for('viewSecondaryBanner'))
+        except Exception as e:
+            return jsonify({'return': 'error getting banner :- '+str(e)})
+    return render_template('editSecondaryBanner.html', banner=banner)
+
+@app.route('/deleteSecondaryBanner/<id>', methods=['GET', 'POST'])
+@login_required
+def deleteSecondaryBanner(id):
+    banner = SecondaryBanner.query.get_or_404(id)
+    try:
+        db.session.delete(banner)
+        db.session.commit()
+        return redirect(url_for('viewSecondaryBanner'))
+    except Exception as e:
+        return jsonify({'return': 'error deleting banner :- '+str(e)})
+
+
+
 
