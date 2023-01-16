@@ -224,6 +224,7 @@
 </ul>
 
 
+
 <h3>Verify user</h3>
 <ul>
     <p>Verify a user</p>
@@ -259,19 +260,20 @@
 
 
 
-<h3>Delete User Address</h3>
+<h3>Deactivate User</h3>
 <ul>
-    <p>Delete a address for a user</p>
-    <p>URL: /user_addr/{id}</p>
-    <p>Method: DELETE</p>
-    <p>Example : https://kenz-food-api.herokuapp.com/user_addr/1</p>
+    <p>Deactivate a user</p>
+    <p>URL: /deactivate/{id}</p>
+    <p>Method: PUT</p>
+    <p>URL Content-Type: JSON</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/deactivate/1</p>
     
        
-        Example Response body:
+        Example Input body:
         {
-            'message': 'Address deleted successfully',
-            'return': 'success'
+            'return': "success User Deactivated"
         }
+
 </ul>
 
 
