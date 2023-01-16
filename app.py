@@ -494,10 +494,27 @@ def verify(user_id):
         return jsonify({'return': 'no PUT request'})
 
 
+@app.route('/user_deactivate/<int:user_id>', methods=['PUT'])
+def user_deactivate(user_id):
+    if request.method == 'PUT':
+        user = Users.query.filter_by(id=user_id).first()
+        if user:
+            user.verified_user = False
+            user.active_user = 'deactivated'
+            user.username = user.username + '#000'
+            user.email = user.email + '#000'
+            user.phone = user.phone + '#000'
+            db.session.commit()
+            return jsonify({'return': 'success User Deactivated'})
+        else:
+            return jsonify({'return': 'user not found'})
+    else:
+        return jsonify({'return': 'no PUT request'})
+
 
 
 @app.route('/get_users/<parm>', methods=['GET'])
-def get_users( parm):
+def get_users(parm):
 
     # if not jwt_current_user:
     #     return jsonify({'return': 'user not logged in'})
@@ -689,6 +706,7 @@ def delete_user_addr(jwt_current_user, id):
         except Exception as e:
             return jsonify({'return': 'error', 'message': 'error deleting address : '+ str(e)})
     return jsonify({'return': 'no DELETE request'})
+
 
 
 
