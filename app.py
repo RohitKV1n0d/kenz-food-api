@@ -47,7 +47,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'dev'
+ENV = 'prod'
 
 if ENV == 'dev' :
     app.debug = True
@@ -720,6 +720,27 @@ def banner():
 
 
 @app.route('/secondary_banner', methods=['GET'])
+def secondary_banner():
+    if request.method == 'GET':
+        try:
+            get_banner = SecondaryBanner.query.all()
+            if get_banner:
+                banner = []
+                for item in get_banner:
+                    banner.append({
+                        'id': item.id,
+                        'banner_name_en': item.banner_name_en,
+                        'banner_image_url': item.banner_image_url,
+                        'status': item.status,
+                        'banner_desc_en': item.banner_desc_en
+                    })
+                return jsonify({'return': 'success', 'message': 'banner fetched', 'data': banner})
+            else:
+                return jsonify({'return': 'error', 'message': 'banner not found'})
+        except Exception as e:
+            return jsonify({'return': 'error', 'message': 'error fetching banner : '+ str(e)})
+    else:
+        return jsonify({'return': 'error', 'message': 'method not allowed'})
 
 
 @app.route('/get_categories', methods=['GET'])
@@ -2195,6 +2216,8 @@ def deleteBanner(id):
     except Exception as e:
         return jsonify({'return': 'error deleting banner :- '+str(e)})
 
+
+
 @app.route('/termsandconditions')
 def termsandconditions():
     return render_template('Terms-and-Conditions-for-Kenz-Food.html')
@@ -2202,6 +2225,7 @@ def termsandconditions():
 @app.route('/privacypolicy')
 def privacypolicy():   
     return render_template('Privacy-Policy-for-Kenz-Food.html')
+
 
 
 @app.route('/addSecondaryBanner', methods=['GET', 'POST'])
