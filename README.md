@@ -301,6 +301,30 @@
     }
 </ul>
 
+<h3>Get all Secondary Banner</h3>
+<ul>
+    <p>Get all data from secondary banner table</p>
+    <p>URL: /secondary_banner</p>
+    <p>Method : GET</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/secondary_banner</p>
+    
+    Response Body: JSON Object
+    Example:
+    {
+        "data": [
+            {
+                "banner_desc_en": "qweqwe",
+                "banner_image_url": "https://i.imgur.com/vy00tog.jpg",
+                "banner_name_en": "Test ",
+                "id": 1,
+                "status": null
+            }
+        ],
+        "message": "banner fetched",
+        "return": "success"
+    }
+</ul>
+
 
 
 <h2>Category APIs</h2>
