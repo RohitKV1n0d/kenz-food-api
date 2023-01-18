@@ -1,5 +1,69 @@
 <h1>Kenz-Food-APIs Documentaions</h1>
 
+1. [User Authentication](#user-authentication)
+    - [Sign In User](#sign-in-user)
+    - [Token Headers format](#token-headers-format)
+2. [User APIs](#user-apis)
+    - [Insert User](#insert-user)
+    - [Get Users](#get-users)
+    - [Add User Address](#add-user-address)
+    - [Get All User Address](#get-all-user-address)
+    - [Get User Address with id](#get-user-address-with-id)
+    - [Get User Address with id](#get-user-address-with-id)
+    - [Update User Address](#update-user-address)
+    - [Verify user](#verify-user)
+    - [Check user Verification](#check-user-verification)
+    - [Deactivate user](#deactivate-user)
+
+3. [Banner API](#banner-api)
+    - [Get all Banners](#get-all-banners)
+    - [Get all Secondary Banner](#get-all-secondary-banner)
+    - [Get all Notifications](#get-all-notifications)
+
+4. [Category APIs](#category-apis)
+    - [Get all Categories](#get-all-categories)
+    - [Get SubCategory by ID](#get-subcategory-by-id)
+
+5. [Product APIs](#product-apis)
+    - [Get all Products by search](#get-all-products-by-search)
+    - [Get Fast delivery Products](#get-fast-delivery-products)
+    - [Get Normal delivery Products](#get-normal-delivery-products)
+    - [Get Product images by ID](#get-product-images-by-id)
+    - [Get Product Stock data by ID](#get-product-stock-data-by-id)
+    - [Get Products](#get-products)
+    - [Add Products](#add-products)
+    - [Product Status](#product-status)
+
+6. [Cart APIs](#cart-apis)
+    - [Add Product to cart](#add-product-to-cart)
+    - [Get all items in Cart](#get-all-items-in-cart)
+    - [Delete Cart item](#delete-cart-item)
+    - [Clear cart](#clear-cart)
+    - [Increment Cart item](#increment-cart-item)
+    - [Decrement Cart item](#decrement-cart-item)
+
+6. [Wishlist APIs](#wishlist-apis)
+    - [Add to Wishlist](#add-to-wishlist)
+    - [Get all Wishlist items](#get-all-wishlist-items)
+    - [Delete Wishlist item](#delete-wishlist-item)
+    - [Clear wishlist](#clear-wishlist)
+    - [Check for an item in Wishlist](#check-for-an-item-in-wishlist)
+
+7. [Order APIs](#order-apis)
+    - [Place Order](#place-order)
+    - [Get all Orders](#get-all-orders)
+    - [Get specific Order](#get-specific-order)
+    - [Get all Order items](#get-all-order-items)
+    - [Cancel Order](#cancel-order)
+
+    
+    
+    
+
+
+
+
+
 <h2>User Authentication</h2>
 
 <h3>Sign In User</h3>
@@ -58,8 +122,6 @@
       
 </ul>
 
-
-        
     
 
 <h3>Get Users</h3>
@@ -328,7 +390,7 @@
     }
 </ul>
 
-<h3>Get all Notifications </h3>
+<h3>Get all Notifications</h3>
 <ul>
     <p>Get all data from notification table</p>
     <p>URL: /notifications</p>
