@@ -410,10 +410,21 @@ def insert_users():
                     password=generate_password_hash(content['password'], method='sha256'),
                     email=content['email'],
                     phone=content['phone'],
+                    created_at=datetime.datetime.now()
                 )
                 db.session.add(user)
                 db.session.commit()
-            return jsonify({'return': 'user added successfully'})
+                current_user = Users.query.filter_by(email=content['email']).first()
+            return jsonify({'return': 'user added successfully',
+                            'user_id': current_user.id,
+                            'user_type': current_user.user_type,
+                            'public_id': current_user.public_id,
+                            'username': current_user.username,
+                            'firstname': current_user.firstname,
+                            'lastname': current_user.lastname,
+                            'email': current_user.email,
+                            'phone': current_user.phone,
+                            'created_at': current_user.created_at})
         except Exception as e:
             return jsonify({'return': 'error adding user'+str(e)})
     return jsonify({'return': 'no POST request'})
