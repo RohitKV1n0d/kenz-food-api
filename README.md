@@ -119,6 +119,20 @@
             "email" : "admin@admin.com",
             "phone" :  "1234567890"
         }
+
+        Example Response body:
+        {
+            "created_at": "2023-01-18 09:56:42.669695",
+            "email": "admin@admin.com",
+            "firstname": "adminf",
+            "lastname": "adminl",
+            "phone": "1234567890",
+            "public_id": "69e853bf-8cb0-4845-8937-37aadd574d71",
+            "return": "user added successfully",
+            "user_id": 1,
+            "user_type": "admin",
+            "username": "admin"
+        }
       
 </ul>
 
