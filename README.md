@@ -151,18 +151,19 @@
         "email": "admin@admin.com",
         "fcm_id": null,
         "firstname": "adminf",
-        "ip_address": "0.0.0.0",
+        "ip_address": "10.1.11.233",
         "last_login": null,
         "lastname": "adminl",
         "latitude": null,
         "longitude": null,
-        "password": "admin123",
+        "password": "sha256$zPVbqIAsXT7soQq9$103a327c03c45e6a4755c3c94d225be702d49cb5426d0be3bfc2dc2fe45d259b",
         "phone": "1234567890",
         "profile_url": null,
+        "publci_id": "ae6b0ef5-fcce-4148-b03c-7a836803ef8f",
         "return": "success",
         "user": "admin",
         "user_type": "admin",
-        "verified_user": null
+        "verified_user": false
     }
         
 
