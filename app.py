@@ -519,6 +519,7 @@ def get_users(parm):
     def get_USER_query(user):
         user_json = {
                     'return': 'success', 
+                    'id': user.id,
                     'publci_id': user.public_id,
                     'user': user.username,
                     'email': user.email,
