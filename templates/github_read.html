@@ -461,10 +461,10 @@
 <h3>Get all Products by search</h3>
 <ul>
     <p>Get all products data by search query</p>
-    <p>URL: /get_products</p>
+    <p>URL: /products</p>
     <p>Method : GET</p>
     <p>PARAM : search </p>
-    <p>Example : http://kenz-food-api.herokuapp.com/get_products?search=chicken</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/products?search=chi</p>
     
     Response Body: JSON Object
     Example:
@@ -516,6 +516,168 @@
         "return": "success" }
 </ul>
 
+<h3>Get Fast delivery Products</h3>
+<ul>
+    <p>Get all products data by search query</p>
+    <p>URL: /get_products/fast_delivery</p>
+    <p>Method : GET</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/get_products/fast_delivery</p>
+    
+    Response Body: JSON Object
+    Example:
+    {
+        "products": [
+            {
+                "cat_id": 1,
+                "fast_delivery": "1",
+                "featured": "0",
+                "fresh": "0",
+                "id": 2,
+                "offer": "0",
+                "other_title_ar": "123",
+                "other_title_en": "894",
+                "product_barcode": "84",
+                "product_cat_id": 1,
+                "product_code": "9849",
+                "product_desc_ar": "498",
+                "product_desc_en": "498",
+                "product_images": [
+                    {
+                        "id": 3,
+                        "product_id": 2,
+                        "product_image_url": "https://i.imgur.com/mgO1fLo.png"
+                    }
+                ],
+                "product_name_ar": "498",
+                "product_name_en": "48",
+                "product_stock": [
+                    {
+                        "id": 2,
+                        "main_rack_no": null,
+                        "max_stock": "9494",
+                        "min_stock": "94",
+                        "opening_stock": "984",
+                        "product_id": 2,
+                        "product_offer_price": "9849",
+                        "product_price": "984",
+                        "product_purchase_price": "84",
+                        "sub_rack_no": null
+                    }
+                ],
+                "product_subcat_id": 1,
+                "status": "enable",
+                "subcat_id": 1,
+                "unit_quantity": "49"
+            }
+        ],
+        "return": "success"
+    }
+</ul>
+
+<h3>Get Normal delivery Products</h3>
+<ul>
+    <p>Get all products data by search query</p>
+    <p>URL: /get_products/normal_delivery</p>
+    <p>Method : GET</p>
+    <p>Example : http://kenz-food-api.herokuapp.com/get_products/normal_delivery</p>
+    
+    Response Body: JSON Object
+    Example:
+    
+    "products": [
+        {
+            "cat_id": 1,
+            "fast_delivery": "0",
+            "featured": "0",
+            "fresh": "0",
+            "id": 1,
+            "offer": "0",
+            "other_title_ar": "15",
+            "other_title_en": "5",
+            "product_barcode": "51",
+            "product_cat_id": 1,
+            "product_code": "51",
+            "product_desc_ar": "qweqw",
+            "product_desc_en": "eqwe",
+            "product_images": [
+                {
+                    "id": 1,
+                    "product_id": 1,
+                    "product_image_url": "https://i.imgur.com/uwWaWvs.jpg"
+                },
+                {
+                    "id": 2,
+                    "product_id": 1,
+                    "product_image_url": "https://i.imgur.com/noaIyZa.png"
+                }
+            ],
+            "product_name_ar": "weqwe",
+            "product_name_en": "qwe12",
+            "product_stock": [
+                {
+                    "id": 1,
+                    "main_rack_no": null,
+                    "max_stock": "1",
+                    "min_stock": "15",
+                    "opening_stock": "55",
+                    "product_id": 1,
+                    "product_offer_price": "234",
+                    "product_price": "234",
+                    "product_purchase_price": "234",
+                    "sub_rack_no": null
+                }
+            ],
+            "product_subcat_id": 1,
+            "status": "enable",
+            "subcat_id": 1,
+            "unit_quantity": "123"
+        },
+        {
+            "cat_id": 1,
+            "fast_delivery": "0",
+            "featured": "0",
+            "fresh": "0",
+            "id": 3,
+            "offer": "0",
+            "other_title_ar": "51",
+            "other_title_en": "516",
+            "product_barcode": "516",
+            "product_cat_id": 1,
+            "product_code": "516",
+            "product_desc_ar": "165",
+            "product_desc_en": "165",
+            "product_images": [
+                {
+                    "id": 4,
+                    "product_id": 3,
+                    "product_image_url": "https://i.imgur.com/dcXAIvA.png"
+                }
+            ],
+            "product_name_ar": "5",
+            "product_name_en": "chicken Biryani",
+            "product_stock": [
+                {
+                    "id": 3,
+                    "main_rack_no": null,
+                    "max_stock": "6516",
+                    "min_stock": "651",
+                    "opening_stock": "51",
+                    "product_id": 3,
+                    "product_offer_price": "16",
+                    "product_price": "6515",
+                    "product_purchase_price": "516",
+                    "sub_rack_no": null
+                }
+            ],
+            "product_subcat_id": 1,
+            "status": "enable",
+            "subcat_id": 1,
+            "unit_quantity": "165"
+        }
+    ],
+    "return": "success"
+}
+</ul>
 
 <h3>Get Product images by ID</h3>
 <ul>

@@ -1103,7 +1103,7 @@ def search_products():
         key = request.args.get('search')
 
         try:
-            get_products = Products.query.filter(Products.product_name_en.like('%'+key+'%')).all()
+            get_products = Products.query.filter(Products.product_name_en.ilike('%'+key+'%')).all()
             if get_products:
                 products_json = []
                 products_stocks_json = []
@@ -1194,7 +1194,7 @@ def changeProductStatus(status):
 def get_fast_delivery_products():
     if request.method == 'GET':
         try:
-            get_products = Products.query.filter_by(fast_delivery='yes').all()
+            get_products = Products.query.filter_by(fast_delivery="1").all()
             if get_products:
                 products_json = []
                 products_stocks_json = []
@@ -1263,7 +1263,7 @@ def get_fast_delivery_products():
 def get_normal_delivery_products():
     if request.method == 'GET':
         try:
-            get_products = Products.query.filter_by(fast_delivery='no').all()
+            get_products = Products.query.filter_by(fast_delivery="0").all()
             if get_products:
                 products_json = []
                 products_stocks_json = []
