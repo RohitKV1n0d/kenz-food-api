@@ -374,13 +374,11 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
-
-@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
     productCategory = ProductCategory.query.all()
-
+    # render the index.html template
     return render_template('index.html', user=current_user, productCategory=productCategory)
 
 
@@ -469,13 +467,24 @@ def update_password(user_id):
         content = request.json
         user = Users.query.filter_by(id=user_id).first()
         if user:
-            user.password = generate_password_hash(content['password'], method='sha256')
+            user.password = generate_password_hash(content['new_password'], method='sha256')
             db.session.commit()
-            return jsonify({'return': 'success'})
+            return jsonify({'return': 'success',
+                            'user_id': user.id,
+                            'user_type': user.user_type,
+                            'public_id': user.public_id,
+                            'username': user.username,
+                            'firstname': user.firstname,
+                            'lastname': user.lastname,
+                            'email': user.email,
+                            'phone': user.phone,
+                            'created_at': user.created_at})
         else:
             return jsonify({'return': 'user not found'})
     else:
-        return jsonify({'return': 'no POST request'})
+        return jsonify({'return': 'no PUT request'})
+
+
 
 
 
@@ -502,22 +511,63 @@ def verify(user_id):
         return jsonify({'return': 'no PUT request'})
 
 
-@app.route('/user_deactivate/<int:user_id>', methods=['PUT'])
-def user_deactivate(user_id):
+
+@app.route('/update_user', methods=['PUT'])
+@token_required
+def update_user(current_user):
     if request.method == 'PUT':
-        user = Users.query.filter_by(id=user_id).first()
+        content = request.json
+        user = Users.query.filter_by(id=current_user.id).first()
         if user:
-            user.verified_user = False
-            user.active_user = 'deactivated'
-            user.username = user.username + '#000'
-            user.email = user.email + '#000'
-            user.phone = user.phone + '#000'
+            user.firstname = content['firstname']
+            user.lastname = content['lastname']
+            user.email = content['email']
+            user.phone = content['phone']
+            user_image = request.files.get('user_image')
+            if user_image:
+                img_filename = secure_filename(user_image.filename)
+                basedir = os.path.abspath(os.path.dirname(__file__))
+                user_image.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))   
+                upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                user.profile_url = upload_image.link
             db.session.commit()
-            return jsonify({'return': 'success User Deactivated'})
+            os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+
+            return jsonify({'return': 'success'})
         else:
             return jsonify({'return': 'user not found'})
     else:
         return jsonify({'return': 'no PUT request'})
+
+
+
+
+
+@app.route('/user_deactivate', methods=['PUT'])
+@token_required
+def user_deactivate(current_user):
+    if request.method == 'PUT':
+        content = request.json
+        user = Users.query.filter_by(id=current_user.id).first()
+        #check password
+        if user:
+            if check_password_hash(user.password, content['password']):
+                user.verified_user = False
+                user.active_user = 'deactivated'
+                user.username = user.username + '#000'
+                user.email = user.email + '#000'
+                user.phone = user.phone + '#000'
+                db.session.commit()
+                return jsonify({'return': 'success'})
+            else:
+                return jsonify({'return': 'incorrect password'})
+        else:
+            return jsonify({'return': 'user not found'})
+    else:
+        return jsonify({'return': 'no PUT request'})
+
+
+
 
 
 
