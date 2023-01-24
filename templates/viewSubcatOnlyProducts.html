@@ -11,8 +11,20 @@
     
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="float-left">
                         <a href="{{url_for('addProductWithSubcat', subcat_id=sub_cat.id)}}" class="btn btn-success" style="text-align: right;">Add Products</a>
+                                </div>
+                                <div class="float-right">
+                                    <form action="/addProducts/execl/{{sub_cat.id}}" method="post" enctype="multipart/form-data" >
+                                        <input type="file" multiple accept="application/execl" name="file" required>
+                                        <button  type="submit" class="btn btn-secondary">Upload <img src="{{ url_for('static', filename='img/execl-icon.png') }}"  style="max-height: 30px;" alt=""></button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body" >
                         <div class="table-responsive"  >

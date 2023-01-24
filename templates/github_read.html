@@ -11,6 +11,8 @@
     - [Get User Address with id](#get-user-address-with-id)
     - [Get User Address with id](#get-user-address-with-id)
     - [Update User Address](#update-user-address)
+    - [Update user Password](#update-user-password)
+    - [Update user Profile](#update-user-profile)
     - [Verify user](#verify-user)
     - [Check user Verification](#check-user-verification)
     - [Deactivate user](#deactivate-user)
@@ -294,11 +296,46 @@
     
        
         Example Input body:
-        {
+        {   
             'password': "admin123"
+        }
+        Example Response body:
+        {
+            "created_at": "2023-01-18 09:56:42.669695",
+            "email": "admin@admin.com",
+            "firstname": "adminf",
+            "lastname": "adminl",
+            "phone": "1234567890",
+            "public_id": "69e853bf-8cb0-4845-8937-37aadd574d71",
+            "return": "user added successfully",
+            "user_id": 1,
+            "user_type": "admin",
+            "username": "admin"
         }
 
 </ul>
+
+<h3>Update user Profile</h3>
+<ul>
+    <p>Update a profile for a user</p>
+    <p>URL: /update_user</p>
+    <p>Method: PUT</p>
+    <p>URL Content-Type: multipart/form-data</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/update_user</p>
+    
+       
+        Example Input Keys:
+        ['firstname'] ('String')
+        ['lastname'] ('String')
+        ['email'] ('String')
+        ['mobile'] ('String')
+        ['user_image'] ('File')
+        
+       
+
+</ul>
+
+
 
 
 
@@ -345,11 +382,16 @@
     <p>URL Content-Type: JSON</p>
     <p>Example : https://kenz-food-api.herokuapp.com/deactivate/1</p>
     
-       
-        Example Input body:
+       Example Input body:
+        {
+            'password': "admin123"
+        }
+
+        Example Response body:
         {
             'return': "success User Deactivated"
         }
+        
 
 </ul>
 

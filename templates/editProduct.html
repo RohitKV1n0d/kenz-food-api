@@ -15,11 +15,11 @@
             <form  method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="categoryName">Product Name</label>
-                    <input type="text" class="form-control" id="product_name_en" name="product_name_en" placeholder="Enter Product Name" value="prod.product_name_en">
+                    <input type="text" class="form-control" id="product_name_en" name="product_name_en" placeholder="Enter Product Name" value="{{prod.product_name_en}}">
                 </div>
                 <div class="form-group">
                     <label for="categoryName">Product Name(Arabic)</label>
-                    <input type="text" class="form-control" id="product_name_ar" name="product_name_ar" placeholder="Enter Product Name (Arabic)" value="prod.product_name_ar">
+                    <input type="text" class="form-control" id="product_name_ar" name="product_name_ar" placeholder="Enter Product Name (Arabic)" value="{{prod.product_name_ar}}">
                 </div>
 
                 <div class="form-group">
@@ -29,15 +29,15 @@
                 </div>
                 <div class="form-group">
                     <label for="categoryName">Product Discription(Arabic)</label>
-                    <textarea type="text" class="form-control" id="product_desc_ar" rows="4" cols="50" name="product_desc_ar" placeholder="Enter Product Discription(Arabic)" >{{"prod.product_desc_ar"}}</textarea>
+                    <textarea type="text" class="form-control" id="product_desc_ar" rows="4" cols="50" name="product_desc_ar" placeholder="Enter Product Discription(Arabic)" >{{prod.product_desc_ar}}</textarea>
                 </div> 
                 <div class="form-group">
                     <label for="categoryName">Unit</label>
-                    <input type="text" class="form-control" id="unit" rows="4" cols="50" name="unit" placeholder="Enter Product Unit" value="prod.unit_id">
+                    <input type="text" class="form-control" id="unit" rows="4" cols="50" name="unit" placeholder="Enter Product Unit" value="{{prod.unit_id}}">
                 </div> 
                 <div class="form-group">
                     <label for="categoryName">Unit Quantity</label>
-                    <input type="text" class="form-control" id="unit_quantity" rows="4" cols="50" name="unit_quantity" placeholder="Enter Product Unit Quantity" value="prod.unit_quantity">
+                    <input type="text" class="form-control" id="unit_quantity" rows="4" cols="50" name="unit_quantity" placeholder="Enter Product Unit Quantity" value="{{prod.unit_quantity}}">
                 </div> 
                 
 
@@ -53,27 +53,27 @@
 
                 <div class="form-group">
                     <label for="categoryName">Product Price</label>
-                    <input type="text" class="form-control" id="product_price" rows="4" cols="50" name="product_price" placeholder="Enter Product Price" value="prod_stock.">
+                    <input type="text" class="form-control" id="product_price" rows="4" cols="50" name="product_price" placeholder="Enter Product Price" value="{{prod_stock[0].product_price}}">
                 </div> 
                 <div class="form-group">
                     <label for="categoryName">Product Offer Price</label>
-                    <input type="text" class="form-control" id="product_offer_price" rows="4" cols="50" name="product_offer_price" placeholder="Enter Product Offer Price" value="prod_stock.product_price">
+                    <input type="text" class="form-control" id="product_offer_price" rows="4" cols="50" name="product_offer_price" placeholder="Enter Product Offer Price" value="{{prod_stock[0].product_offer_price}}">
                 </div> 
                 <div class="form-group">
                     <label for="categoryName">Product Purchase Price</label>
-                    <input type="text" class="form-control" id="product_purchase_price" rows="4" cols="50" name="product_purchase_price" placeholder="Enter Product Purchase Price " value="prod_stock.product_offer_price">
+                    <input type="text" class="form-control" id="product_purchase_price" rows="4" cols="50" name="product_purchase_price" placeholder="Enter Product Purchase Price " value="{{prod_stock[0].product_purchase_price}}">
                 </div> 
                 <div class="form-group">
                     <label for="categoryName">Opening stock</label>
-                    <input type="text" class="form-control" id="opening_stock" rows="4" cols="50" name="opening_stock" placeholder="Enter Opening stock" value="prod_stock.opening_stock">
+                    <input type="text" class="form-control" id="opening_stock" rows="4" cols="50" name="opening_stock" placeholder="Enter Opening stock" value="{{prod_stock[0].opening_stock}}">
                 </div> 
                 <div class="form-group">
                     <label for="categoryName">Min Quantity</label>
-                    <input type="text" class="form-control" id="min_stock" rows="4" cols="50" name="min_stock" placeholder="Enter Min Quantity" value="prod_stock.min_stock">
+                    <input type="text" class="form-control" id="min_stock" rows="4" cols="50" name="min_stock" placeholder="Enter Min Quantity" value="{{prod_stock[0].min_stock}}">
                 </div> 
                 <div class="form-group">
                     <label for="categoryName">Max Quantity</label>
-                    <input type="text" class="form-control" id="max_stock" rows="4" cols="50" name="max_stock" placeholder="Enter Max Quantity" value="prod_stock.max_stock">
+                    <input type="text" class="form-control" id="max_stock" rows="4" cols="50" name="max_stock" placeholder="Enter Max Quantity" value="{{prod_stock[0].max_stock}}">
                 </div> 
 
 

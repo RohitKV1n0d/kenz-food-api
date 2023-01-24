@@ -24,6 +24,7 @@ from functools import wraps
 import time
 import random
 
+import xlrd
 
 
 app = Flask(__name__)
@@ -374,13 +375,11 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
-
-@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
     productCategory = ProductCategory.query.all()
-
+    # render the index.html template
     return render_template('index.html', user=current_user, productCategory=productCategory)
 
 
@@ -469,13 +468,24 @@ def update_password(user_id):
         content = request.json
         user = Users.query.filter_by(id=user_id).first()
         if user:
-            user.password = generate_password_hash(content['password'], method='sha256')
+            user.password = generate_password_hash(content['new_password'], method='sha256')
             db.session.commit()
-            return jsonify({'return': 'success'})
+            return jsonify({'return': 'success',
+                            'user_id': user.id,
+                            'user_type': user.user_type,
+                            'public_id': user.public_id,
+                            'username': user.username,
+                            'firstname': user.firstname,
+                            'lastname': user.lastname,
+                            'email': user.email,
+                            'phone': user.phone,
+                            'created_at': user.created_at})
         else:
             return jsonify({'return': 'user not found'})
     else:
-        return jsonify({'return': 'no POST request'})
+        return jsonify({'return': 'no PUT request'})
+
+
 
 
 
@@ -502,22 +512,63 @@ def verify(user_id):
         return jsonify({'return': 'no PUT request'})
 
 
-@app.route('/user_deactivate/<int:user_id>', methods=['PUT'])
-def user_deactivate(user_id):
+
+@app.route('/update_user', methods=['PUT'])
+@token_required
+def update_user(current_user):
     if request.method == 'PUT':
-        user = Users.query.filter_by(id=user_id).first()
+        content = request.json
+        user = Users.query.filter_by(id=current_user.id).first()
         if user:
-            user.verified_user = False
-            user.active_user = 'deactivated'
-            user.username = user.username + '#000'
-            user.email = user.email + '#000'
-            user.phone = user.phone + '#000'
+            user.firstname = content['firstname']
+            user.lastname = content['lastname']
+            user.email = content['email']
+            user.phone = content['phone']
+            user_image = request.files.get('user_image')
+            if user_image:
+                img_filename = secure_filename(user_image.filename)
+                basedir = os.path.abspath(os.path.dirname(__file__))
+                user_image.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))   
+                upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
+                user.profile_url = upload_image.link
             db.session.commit()
-            return jsonify({'return': 'success User Deactivated'})
+            os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+
+            return jsonify({'return': 'success'})
         else:
             return jsonify({'return': 'user not found'})
     else:
         return jsonify({'return': 'no PUT request'})
+
+
+
+
+
+@app.route('/user_deactivate', methods=['PUT'])
+@token_required
+def user_deactivate(current_user):
+    if request.method == 'PUT':
+        content = request.json
+        user = Users.query.filter_by(id=current_user.id).first()
+        #check password
+        if user:
+            if check_password_hash(user.password, content['password']):
+                user.verified_user = False
+                user.active_user = 'deactivated'
+                user.username = user.username + '#000'
+                user.email = user.email + '#000'
+                user.phone = user.phone + '#000'
+                db.session.commit()
+                return jsonify({'return': 'success'})
+            else:
+                return jsonify({'return': 'incorrect password'})
+        else:
+            return jsonify({'return': 'user not found'})
+    else:
+        return jsonify({'return': 'no PUT request'})
+
+
+
 
 
 
@@ -2061,6 +2112,50 @@ def getOrderDetailsWithProduct(jwt_current_user, order_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -2342,6 +2437,82 @@ def addProductWithSubcat(subcat_id):
                             addCat=addCat,
                             addSubcat=addSubcat)
 
+@app.route('/addProducts/execl/<subcat_id>', methods=['GET', 'POST'])
+@login_required
+def addProductsExecl(subcat_id):
+    addSubcat = ProductSubCategory.query.get_or_404(subcat_id)
+    addCat = ProductCategory.query.get_or_404(addSubcat.fk_prod_cat_id)
+    ALLOWED_EXTENSIONS = {'xlsx'}
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+    def status(stat):
+        if str(stat) == 'on' or str(stat) == '1':
+            return "1"
+        else:
+            return "0"
+    
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return 'redirect(request.url)'
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return 'redirect(request.url)'
+        if file and allowed_file(file.filename):
+            print('file')
+            f = request.files['file']
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+            loc = (UPLOAD_FOLDER+f.filename)
+            wb = xlrd.open_workbook(loc)
+            sheet = wb.sheet_by_index(0)
+            sheet.cell_value(0, 0)
+            print(sheet.nrows)
+            for i in range(1, sheet.nrows):
+                with app.app_context():
+                    prod = Products(
+                        product_name_en=sheet.cell_value(i, 0), 
+                        product_name_ar=sheet.cell_value(i, 1),
+                        product_desc_en=sheet.cell_value(i, 2),
+                        product_desc_ar=sheet.cell_value(i, 3),
+                        unit_id=sheet.cell_value(i, 4),
+                        unit_quantity=sheet.cell_value(i, 5),
+                        product_code=sheet.cell_value(i, 12),
+                        produc_barcode=sheet.cell_value(i, 13),
+                        other_title_en=sheet.cell_value(i, 14),
+                        other_title_ar=sheet.cell_value(i, 15),
+                        other_desc_en=sheet.cell_value(i, 16),
+                        other_desc_ar=sheet.cell_value(i, 17),
+                        status=status(sheet.cell_value(i, 18)),
+                        fast_delivery =status(sheet.cell_value(i, 19)),
+                        featured=status(sheet.cell_value(i, 20)),
+                        fresh=status(sheet.cell_value(i, 21)),
+                        offer=status(sheet.cell_value(i, 22)),
+                        cat=addCat.id,
+                        subcat=addSubcat.id
+                    )
+                    db.session.add(prod)
+                    db.session.commit()
+                    prod_stock = ProductStock(fk_product_id=prod.id,
+                        product_price=sheet.cell_value(i,6),
+                        product_offer_price=sheet.cell_value(i, 7),
+                        product_purchase_price=sheet.cell_value(i, 8),
+                        opening_stock=sheet.cell_value(i, 9),
+                        min_stock=sheet.cell_value(i, 10),
+                        max_stock=sheet.cell_value(i, 11)
+                    )
+                    db.session.add(prod_stock)
+                    db.session.commit()
+            return redirect(url_for('viewSubcatOnlyProducts', id=addSubcat.id))
+
+    
+    
+
+
+
+
 @app.route('/addProduct', methods=['POST', 'GET'])
 @login_required
 def addProduct():
@@ -2433,6 +2604,10 @@ def addProduct():
 
 
 
+
+
+
+
 @app.route('/viewProduct', methods=['GET', 'POST'])
 @login_required
 def viewProduct():
@@ -2473,15 +2648,12 @@ def editProduct(id,name):
                     db.session.commit()
                     os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
 
-                prod_stock = ProductStock(fk_product_id=prod.id,
-                        product_price=request.form['product_price'],
-                        product_offer_price=request.form['product_offer_price'],
-                        product_purchase_price=request.form['product_purchase_price'],
-                        opening_stock=request.form['opening_stock'],
-                        min_stock=request.form['min_stock'],
-                        max_stock=request.form['max_stock']
-                )
-                db.session.add(prod_stock)
+                prod_stock[0].product_price=request.form['product_price']
+                prod_stock[0].product_offer_price=request.form['product_offer_price']
+                prod_stock[0].product_purchase_price=request.form['product_purchase_price']
+                prod_stock[0].opening_stock=request.form['opening_stock']
+                prod_stock[0].min_stock=request.form['min_stock']
+                prod_stock[0].max_stock=request.form['max_stock']
                 db.session.commit()
             return redirect(url_for('viewProduct'))
         except Exception as e:
