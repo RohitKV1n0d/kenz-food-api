@@ -48,7 +48,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -2503,7 +2503,7 @@ def addProductsExecl(subcat_id):
             sheet = wb.sheet_by_index(0)
             sheet.cell_value(0, 0)
             print(sheet.nrows)
-            for i in range(1, sheet.nrows):
+            for i in range(2, sheet.nrows):
                 with app.app_context():
                     prod = Products(
                         product_name_en=sheet.cell_value(i, 0), 
@@ -2650,9 +2650,9 @@ def viewProduct():
     return render_template('viewProduct.html', prod=prod, prod_img=prod_img,zip=zip, prod_stock=prod_stock)
 
 
-@app.route('/editProduct/<id>/<name>', methods=['GET', 'POST'])
+@app.route('/editProduct/<id>', methods=['GET', 'POST'])
 @login_required
-def editProduct(id,name):
+def editProduct(id):
     prod = Products.query.get_or_404(id)
     prod_img = ProductImages.query.filter_by(fk_product_id=id).all()
     prod_stock = ProductStock.query.filter_by(fk_product_id=id).all()
@@ -2691,7 +2691,7 @@ def editProduct(id,name):
             return redirect(url_for('viewProduct'))
         except Exception as e:
             return jsonify({'return': 'error getting product :- '+str(e)})
-    return render_template('editProduct.html', prod=prod, prod_img=prod_img, prod_stock=prod_stock , name=name)
+    return render_template('editProduct.html', prod=prod, prod_img=prod_img, prod_stock=prod_stock )
 
 
 
