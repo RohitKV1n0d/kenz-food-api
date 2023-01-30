@@ -2481,10 +2481,16 @@ def addProductsExecl(subcat_id):
 
 
     def status(stat):
-        if str(stat) == 'on' or str(stat) == '1':
+        if str(stat) == 'on' or str(stat) == '1' or stat == 1 :
             return "1"
         else:
             return "0"
+
+    def product_status(stat):
+        if str(stat) == 'on' or str(stat) == '1' or stat == 1 :
+            return "enable"
+        else:
+            return "disable"
     
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -2518,7 +2524,7 @@ def addProductsExecl(subcat_id):
                         other_title_ar=sheet.cell_value(i, 15),
                         other_desc_en=sheet.cell_value(i, 16),
                         other_desc_ar=sheet.cell_value(i, 17),
-                        status=status(sheet.cell_value(i, 18)),
+                        status=product_status(sheet.cell_value(i, 18)),
                         fast_delivery =status(sheet.cell_value(i, 19)),
                         featured=status(sheet.cell_value(i, 20)),
                         fresh=status(sheet.cell_value(i, 21)),
