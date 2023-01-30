@@ -128,8 +128,8 @@ class BannerSection(db.Model):
     banner_name_ar = db.Column(db.String(100), nullable=True)
     banner_order = db.Column(db.String(100), nullable=True)
     banner_image_url = db.Column(db.String(100), nullable=False)
-    banner_desc_en = db.Column(db.String(100), nullable=True)
-    banner_desc_ar = db.Column(db.String(100), nullable=True)
+    banner_desc_en = db.Column(db.String(5000), nullable=True)
+    banner_desc_ar = db.Column(db.String(5000), nullable=True)
     status = db.Column(db.String(100), nullable=True)
 
 class SecondaryBanner(db.Model):
@@ -139,8 +139,8 @@ class SecondaryBanner(db.Model):
     banner_name_ar = db.Column(db.String(100), nullable=True)
     banner_order = db.Column(db.String(100), nullable=True)
     banner_image_url = db.Column(db.String(100), nullable=False)
-    banner_desc_en = db.Column(db.String(100), nullable=True)
-    banner_desc_ar = db.Column(db.String(100), nullable=True)
+    banner_desc_en = db.Column(db.String(5000), nullable=True)
+    banner_desc_ar = db.Column(db.String(5000), nullable=True)
     status = db.Column(db.String(100), nullable=True)
 
 
@@ -152,8 +152,8 @@ class ProductCategory(db.Model):
     category_name_ar = db.Column(db.String(100), nullable=True)
     category_order = db.Column(db.String(100), nullable=True)
     category_image_url = db.Column(db.String(100), nullable=True)
-    category_desc_en = db.Column(db.String(100), nullable=True)
-    category_desc_ar = db.Column(db.String(100), nullable=True)
+    category_desc_en = db.Column(db.String(5000), nullable=True)
+    category_desc_ar = db.Column(db.String(5000), nullable=True)
     active = db.Column(db.String(100), nullable=True)
 
     cat_product = db.relationship('Products', backref='product')
@@ -168,8 +168,8 @@ class ProductSubCategory(db.Model):
     subcategory_name_ar = db.Column(db.String(100), nullable=True)
     subcategory_order = db.Column(db.String(100), nullable=True)
     subcategory_image_url = db.Column(db.String(100), nullable=True)
-    subcategory_desc_en = db.Column(db.String(100), nullable=True)
-    subcategory_desc_ar = db.Column(db.String(100), nullable=True)
+    subcategory_desc_en = db.Column(db.String(5000), nullable=True)
+    subcategory_desc_ar = db.Column(db.String(5000), nullable=True)
     active = db.Column(db.String(100), nullable=True)
 
     # fk_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -183,8 +183,8 @@ class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name_en = db.Column(db.String(100), nullable=False)
     product_name_ar = db.Column(db.String(100), nullable=True)
-    product_desc_en = db.Column(db.String(100), nullable=True)
-    product_desc_ar = db.Column(db.String(100), nullable=True)
+    product_desc_en = db.Column(db.String(5000), nullable=True)
+    product_desc_ar = db.Column(db.String(5000), nullable=True)
     unit_id = db.Column(db.String(100), nullable=True)
     unit_quantity = db.Column(db.String(100), nullable=True)
     product_code = db.Column(db.String(100), nullable=True)
@@ -217,8 +217,8 @@ class ProductImages(db.Model):
     __tablename__ = 'productimages'
     id = db.Column(db.Integer, primary_key=True)
     product_image_url = db.Column(db.String(100), nullable=True)
-    product_image_desc_en = db.Column(db.String(100), nullable=True)
-    product_image_desc_ar = db.Column(db.String(100), nullable=True)
+    product_image_desc_en = db.Column(db.String(5000), nullable=True)
+    product_image_desc_ar = db.Column(db.String(5000), nullable=True)
 
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
@@ -264,8 +264,8 @@ class UserType(db.Model):
 class UserAddress(db.Model):
     __tablename__ = 'useraddress'
     id = db.Column(db.Integer, primary_key=True)
-    address_line1 = db.Column(db.String(100), nullable=True)
-    address_line2 = db.Column(db.String(100), nullable=True)
+    address_line1 = db.Column(db.String(5000), nullable=True)
+    address_line2 = db.Column(db.String(5000), nullable=True)
     city = db.Column(db.String(100), nullable=True)
     postal_code = db.Column(db.String(100), nullable=True)
     country = db.Column(db.String(100), nullable=True)
