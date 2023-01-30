@@ -16,10 +16,10 @@
     - [Get User Address with id](#get-user-address-with-id)
     - [Update User Address*](#update-user-address)
     - [Update user Password](#update-user-password)
-    - [Update user Profile*](#update-user-profile)
+    - [Update Current user Profile*](#update-current-user-profile)
     - [Verify user](#verify-user)
     - [Check user Verification](#check-user-verification)
-    - [Deactivate user](#deactivate-user)
+    - [Deactivate current User*](#deactivate-current-user)
 
 3. [Banner API](#banner-api)
     - [Get all Banners](#get-all-banners)
@@ -354,7 +354,7 @@
 
 </ul>
 
-<h3>Update user Profile</h3>
+<h3>Update Current user Profile</h3>
 <ul>
     <p>Update a profile for a user</p>
     <p>URL: /update_user</p>
@@ -413,13 +413,13 @@
 
 
 
-<h3>Deactivate User</h3>
+<h3>Deactivate current User</h3>
 <ul>
     <p>Deactivate a user</p>
-    <p>URL: /deactivate/{id}</p>
+    <p>URL: /deactivate</p>
     <p>Method: PUT</p>
     <p>URL Content-Type: JSON</p>
-    <p>Example : https://kenz-food-api.herokuapp.com/deactivate/1</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_deactivate</p>
     
        Example Input body:
         {
