@@ -2481,13 +2481,13 @@ def addProductsExecl(subcat_id):
 
 
     def status(stat):
-        if str(stat) == 'on' or str(stat) == '1':
+        if str(stat) == 'on' or str(stat) == '1' or stat == 1 :
             return "1"
         else:
             return "0"
 
     def product_status(stat):
-        if str(stat) == 'on' or str(stat) == '1':
+        if str(stat) == 'on' or str(stat) == '1' or stat == 1 :
             return "enable"
         else:
             return "disable"
