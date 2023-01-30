@@ -48,7 +48,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -2654,6 +2654,7 @@ def viewProduct():
 @login_required
 def editProduct(id):
     prod = Products.query.get_or_404(id)
+    subcat = ProductSubCategory.query.get_or_404(prod.subcat)
     prod_img = ProductImages.query.filter_by(fk_product_id=id).all()
     prod_stock = ProductStock.query.filter_by(fk_product_id=id).all()
     if request.method == 'POST':
@@ -2688,7 +2689,7 @@ def editProduct(id):
                 prod_stock[0].min_stock=request.form['min_stock']
                 prod_stock[0].max_stock=request.form['max_stock']
                 db.session.commit()
-            return redirect(url_for('viewProduct'))
+            return redirect(url_for('viewSubcatOnlyProducts', id=subcat.id))
         except Exception as e:
             return jsonify({'return': 'error getting product :- '+str(e)})
     return render_template('editProduct.html', prod=prod, prod_img=prod_img, prod_stock=prod_stock )
@@ -2699,10 +2700,11 @@ def editProduct(id):
 @login_required
 def deleteProduct(id):
     prod = Products.query.get_or_404(id)
+    subcat = ProductSubCategory.query.get_or_404(prod.subcat)
     try:
         db.session.delete(prod)
         db.session.commit()
-        return redirect(url_for('viewProduct'))
+        return redirect(url_for('viewSubcatOnlyProducts', id=subcat.id))
     except Exception as e:
         return jsonify({'return': 'error deleting product :- '+str(e)})
 
