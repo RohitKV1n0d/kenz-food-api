@@ -1,21 +1,25 @@
 <h1>Kenz-Food-APIs Documentaions</h1>
 
+<b>(Token required)* </b>
+
+
 1. [User Authentication](#user-authentication)
     - [Sign In User](#sign-in-user)
-    - [Token Headers format](#token-headers-format)
+    - [Token Headers format*](#token-headers-format)
 2. [User APIs](#user-apis)
     - [Insert User](#insert-user)
     - [Get Users](#get-users)
-    - [Add User Address](#add-user-address)
+    - [Get Current User Details*](#get-current-user-details)
+    - [Add User Address*](#add-user-address)
     - [Get All User Address](#get-all-user-address)
     - [Get User Address with id](#get-user-address-with-id)
     - [Get User Address with id](#get-user-address-with-id)
-    - [Update User Address](#update-user-address)
+    - [Update User Address*](#update-user-address)
     - [Update user Password](#update-user-password)
-    - [Update user Profile](#update-user-profile)
+    - [Update Current user Profile*](#update-current-user-profile)
     - [Verify user](#verify-user)
     - [Check user Verification](#check-user-verification)
-    - [Deactivate user](#deactivate-user)
+    - [Deactivate current User*](#deactivate-current-user)
 
 3. [Banner API](#banner-api)
     - [Get all Banners](#get-all-banners)
@@ -37,26 +41,26 @@
     - [Product Status](#product-status)
 
 6. [Cart APIs](#cart-apis)
-    - [Add Product to cart](#add-product-to-cart)
-    - [Get all items in Cart](#get-all-items-in-cart)
-    - [Delete Cart item](#delete-cart-item)
-    - [Clear cart](#clear-cart)
+    - [Add Product to cart*](#add-product-to-cart)
+    - [Get all items in Cart*](#get-all-items-in-cart)
+    - [Delete Cart item*](#delete-cart-item)
+    - [Clear cart*](#clear-cart)
     - [Increment Cart item](#increment-cart-item)
-    - [Decrement Cart item](#decrement-cart-item)
+    - [Decrement Cart item*](#decrement-cart-item)
 
-6. [Wishlist APIs](#wishlist-apis)
-    - [Add to Wishlist](#add-to-wishlist)
-    - [Get all Wishlist items](#get-all-wishlist-items)
-    - [Delete Wishlist item](#delete-wishlist-item)
-    - [Clear wishlist](#clear-wishlist)
-    - [Check for an item in Wishlist](#check-for-an-item-in-wishlist)
+6. [Wishlist APIs*](#wishlist-apis)
+    - [Add to Wishlist*](#add-to-wishlist)
+    - [Get all Wishlist items*](#get-all-wishlist-items)
+    - [Delete Wishlist item*](#delete-wishlist-item)
+    - [Clear wishlist*](#clear-wishlist)
+    - [Check for an item in Wishlist*](#check-for-an-item-in-wishlist)
 
-7. [Order APIs](#order-apis)
-    - [Place Order](#place-order)
-    - [Get all Orders](#get-all-orders)
-    - [Get specific Order](#get-specific-order)
-    - [Get all Order items](#get-all-order-items)
-    - [Cancel Order](#cancel-order)
+7. [Order APIs*](#order-apis)
+    - [Place Order*](#place-order)
+    - [Get all Orders*](#get-all-orders)
+    - [Get specific Order*](#get-specific-order)
+    - [Get all Order items*](#get-all-order-items)
+    - [Cancel Order*](#cancel-order)
 
     
     
@@ -185,6 +189,41 @@
 
 
 </ul>
+
+
+<h3>Get Current User Details</h3>
+<ul>
+    <p>Get current user details from database</p>
+    <p>URL: /get_current_user</p>
+    <p>Method: GET</p>
+    <p>Headers: x-access-token</p>
+    
+       
+        Example Response body:
+        {
+            "active_user": null,
+            "created_at": null,
+            "email": "admin@admin.com",
+            "fcm_id": null,
+            "firstname": "adminf",
+            "ip_address": "10.1.11.233",
+            "last_login": null,
+            "lastname": "adminl",
+            "latitude": null,
+            "longitude": null,
+            "password": "sha256$zPVbqIAsXT7soQq9$103a327c03c45e6a4755c3c94d225be702d49cb5426d0be3bfc2dc2fe45d259b",
+            "phone": "1234567890",
+            "profile_url": null,
+            "publci_id": "ae6b0ef5-fcce-4148-b03c-7a836803ef8f",
+            "return": "success",
+            "user": "admin",
+            "user_type": "admin",
+            "verified_user": false
+        }
+
+</ul>
+
+
 
 <h3>Add User Address</h3>
 <ul>
@@ -315,7 +354,7 @@
 
 </ul>
 
-<h3>Update user Profile</h3>
+<h3>Update Current user Profile</h3>
 <ul>
     <p>Update a profile for a user</p>
     <p>URL: /update_user</p>
@@ -374,13 +413,13 @@
 
 
 
-<h3>Deactivate User</h3>
+<h3>Deactivate current User</h3>
 <ul>
     <p>Deactivate a user</p>
-    <p>URL: /deactivate/{id}</p>
+    <p>URL: /deactivate</p>
     <p>Method: PUT</p>
     <p>URL Content-Type: JSON</p>
-    <p>Example : https://kenz-food-api.herokuapp.com/deactivate/1</p>
+    <p>Example : https://kenz-food-api.herokuapp.com/user_deactivate</p>
     
        Example Input body:
         {

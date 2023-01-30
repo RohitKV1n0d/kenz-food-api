@@ -638,6 +638,38 @@ def get_users(parm):
     return jsonify({'return': 'no GET request'})
 
 
+@app.route('/get_user/current', methods=['GET'])
+@token_required
+def get_user_current(jwt_current_user):
+    if request.method == 'GET':
+        try:
+            user = Users.query.filter_by(id=jwt_current_user.id).first()
+            user_json = {
+                    'return': 'success', 
+                    'id': user.id,
+                    'publci_id': user.public_id,
+                    'user': user.username,
+                    'email': user.email,
+                    'phone': user.phone,
+                    'password': user.password,
+                    'firstname': user.firstname,
+                    'lastname': user.lastname,
+                    'user_type': user.user_type,
+                    'ip_address': user.ip_address,
+                    'profile_url': user.profile_url,
+                    'verified_user': user.verified_user,
+                    'active_user': user.active_user,
+                    'created_at': user.created_at,
+                    'last_login': user.last_login,
+                    'fcm_id': user.fcm_id,
+                    'latitude': user.latitude,
+                    'longitude': user.longitude,
+                    }
+            return jsonify(user_json)
+        except Exception as e:
+            return jsonify({'return': 'error getting users : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+    
 
 
 @app.route('/user_addr', methods=['POST'])
@@ -2471,7 +2503,7 @@ def addProductsExecl(subcat_id):
             sheet = wb.sheet_by_index(0)
             sheet.cell_value(0, 0)
             print(sheet.nrows)
-            for i in range(1, sheet.nrows):
+            for i in range(2, sheet.nrows):
                 with app.app_context():
                     prod = Products(
                         product_name_en=sheet.cell_value(i, 0), 
@@ -2618,9 +2650,9 @@ def viewProduct():
     return render_template('viewProduct.html', prod=prod, prod_img=prod_img,zip=zip, prod_stock=prod_stock)
 
 
-@app.route('/editProduct/<id>/<name>', methods=['GET', 'POST'])
+@app.route('/editProduct/<id>', methods=['GET', 'POST'])
 @login_required
-def editProduct(id,name):
+def editProduct(id):
     prod = Products.query.get_or_404(id)
     prod_img = ProductImages.query.filter_by(fk_product_id=id).all()
     prod_stock = ProductStock.query.filter_by(fk_product_id=id).all()
@@ -2659,7 +2691,7 @@ def editProduct(id,name):
             return redirect(url_for('viewProduct'))
         except Exception as e:
             return jsonify({'return': 'error getting product :- '+str(e)})
-    return render_template('editProduct.html', prod=prod, prod_img=prod_img, prod_stock=prod_stock , name=name)
+    return render_template('editProduct.html', prod=prod, prod_img=prod_img, prod_stock=prod_stock )
 
 
 
