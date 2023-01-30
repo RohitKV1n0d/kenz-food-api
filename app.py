@@ -638,6 +638,38 @@ def get_users(parm):
     return jsonify({'return': 'no GET request'})
 
 
+@app.route('/get_user/current', methods=['GET'])
+@token_required
+def get_user_current(jwt_current_user):
+    if request.method == 'GET':
+        try:
+            user = Users.query.filter_by(id=jwt_current_user.id).first()
+            user_json = {
+                    'return': 'success', 
+                    'id': user.id,
+                    'publci_id': user.public_id,
+                    'user': user.username,
+                    'email': user.email,
+                    'phone': user.phone,
+                    'password': user.password,
+                    'firstname': user.firstname,
+                    'lastname': user.lastname,
+                    'user_type': user.user_type,
+                    'ip_address': user.ip_address,
+                    'profile_url': user.profile_url,
+                    'verified_user': user.verified_user,
+                    'active_user': user.active_user,
+                    'created_at': user.created_at,
+                    'last_login': user.last_login,
+                    'fcm_id': user.fcm_id,
+                    'latitude': user.latitude,
+                    'longitude': user.longitude,
+                    }
+            return jsonify(user_json)
+        except Exception as e:
+            return jsonify({'return': 'error getting users : '+ str(e)})
+    return jsonify({'return': 'no GET request'})
+    
 
 
 @app.route('/user_addr', methods=['POST'])
