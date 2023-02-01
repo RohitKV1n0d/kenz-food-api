@@ -1872,7 +1872,7 @@ def cartToOrder(jwt_current_user, addr_id):
                 total_quantity = 0
                 for item in get_cart:
                     get_item_stocks = ProductStock.query.filter_by(fk_product_id=item.fk_product_id).first()
-                    total_price += int(get_item_stocks.product_price) * int(item.quantity)
+                    total_price += int(float(get_item_stocks.product_offer_price)) * int(float(item.quantity))
                     total_quantity = total_quantity + 1
 
                 order = Order(
