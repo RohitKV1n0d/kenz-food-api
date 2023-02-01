@@ -1311,7 +1311,7 @@
 
     Example Input:
     {
-        "transaction_id": "cash",
+        "transaction_id": "XYZ000000",
     }
 
     Response Body: JSON Object
