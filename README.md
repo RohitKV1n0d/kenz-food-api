@@ -194,9 +194,10 @@
 <h3>Get Current User Details</h3>
 <ul>
     <p>Get current user details from database</p>
-    <p>URL: /get_current_user</p>
+    <p>URL: /get_user/current</p>
     <p>Method: GET</p>
     <p>Headers: x-access-token</p>
+    <p>https://kenz-food-api.herokuapp.com/get_user/current</p>
     
        
         Example Response body:
