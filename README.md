@@ -1309,6 +1309,11 @@
     <p>Parameters : </p>
     <p>Example : http://kenz-food-api.herokuapp.com/order/1</p>
 
+    Example Input:
+    {
+        "transaction_id": "cash",
+    }
+
     Response Body: JSON Object
     Example:
     {
