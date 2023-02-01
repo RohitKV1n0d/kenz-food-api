@@ -194,9 +194,10 @@
 <h3>Get Current User Details</h3>
 <ul>
     <p>Get current user details from database</p>
-    <p>URL: /get_current_user</p>
+    <p>URL: /get_user/current</p>
     <p>Method: GET</p>
     <p>Headers: x-access-token</p>
+    <p>https://kenz-food-api.herokuapp.com/get_user/current</p>
     
        
         Example Response body:
@@ -416,7 +417,7 @@
 <h3>Deactivate current User</h3>
 <ul>
     <p>Deactivate a user</p>
-    <p>URL: /deactivate</p>
+    <p>URL: /user_deactivate</p>
     <p>Method: PUT</p>
     <p>URL Content-Type: JSON</p>
     <p>Example : https://kenz-food-api.herokuapp.com/user_deactivate</p>
@@ -1307,6 +1308,11 @@
     <p>Method : POST</p>
     <p>Parameters : </p>
     <p>Example : http://kenz-food-api.herokuapp.com/order/1</p>
+
+    Example Input:
+    {
+        "transaction_id": "XYZ000000",
+    }
 
     Response Body: JSON Object
     Example:

@@ -324,6 +324,7 @@ class OrderDetails(db.Model):
     item_quantity = db.Column(db.String(100), nullable=False)
     order_date = db.Column(db.DateTime, nullable=True)
     delivery_mode = db.Column(db.DateTime, nullable=True) 
+    transaction_id = db.Column(db.String(100), nullable=True)
 
     fk_product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
 
@@ -545,6 +546,18 @@ def update_user(current_user):
 
 
 
+@app.route('/user/delete/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    if request.method == 'DELETE':
+        user = Users.query.filter_by(id=id).first()
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            return jsonify({'return': 'success'})
+        else:
+            return jsonify({'return': 'user not found'})
+    else:
+        return jsonify({'return': 'no DELETE request'})
 
 
 @app.route('/user_deactivate', methods=['PUT'])
@@ -1849,6 +1862,7 @@ def checkWishlist(jwt_current_user, product_id):
 @token_required
 def cartToOrder(jwt_current_user, addr_id):
     if request.method == 'POST':
+        content = request.get_json()
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id).all()
             # get_cart_items = Products.query.filter_by(id=get_cart.fk_product_id).all()
@@ -1879,6 +1893,7 @@ def cartToOrder(jwt_current_user, addr_id):
                         fk_order_id=order.id,
                         fk_product_id=item.fk_product_id,
                         item_quantity=item.quantity,
+                        transaction_id=content['transaction_id'],
                         order_date=datetime.datetime.now()
                 
                     )
@@ -1955,32 +1970,32 @@ def getOrderDetails(jwt_current_user, order_id):
 
 
 
-# @app.route('/order/details', methods=['GET'])
-# @token_required
-# def getAllOrderDetailsWithProduct(jwt_current_user):
-    if request.method == 'GET':
-        try:
-            get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id).all()
-            if get_order:
-                order_details = []
-                for item in get_order:
-                    get_order_details = OrderDetails.query.filter_by(fk_order_id=item.id).all()
-                    for item in get_order_details:
-                        get_product = Products.query.filter_by(id=item.fk_product_id).first()
-                        order_details.append({
-                            'id': item.id,
-                            'fk_order_id': item.fk_order_id,
-                            'fk_product_id': item.fk_product_id,
-                            'order_date': item.order_date,
+# # @app.route('/order/details', methods=['GET'])
+# # @token_required
+# # def getAllOrderDetailsWithProduct(jwt_current_user):
+#     if request.method == 'GET':
+#         try:
+#             get_order = Order.query.filter_by(fk_user_id=jwt_current_user.id).all()
+#             if get_order:
+#                 order_details = []
+#                 for item in get_order:
+#                     get_order_details = OrderDetails.query.filter_by(fk_order_id=item.id).all()
+#                     for item in get_order_details:
+#                         get_product = Products.query.filter_by(id=item.fk_product_id).first()
+#                         order_details.append({
+#                             'id': item.id,
+#                             'fk_order_id': item.fk_order_id,
+#                             'fk_product_id': item.fk_product_id,
+#                             'order_date': item.order_date,
                            
-                        })
-                return jsonify({'return': 'success', 'order_details': order_details})
-            else:
-                return jsonify({'return': 'error', 'message': 'No Order found'})
-        except Exception as e:
-            return jsonify({'return': 'error', 'message': 'error getting order details : '+ str(e)})
-    else:
-        return jsonify({'return': 'error', 'message': 'method not allowed'})
+#                         })
+#                 return jsonify({'return': 'success', 'order_details': order_details})
+#             else:
+#                 return jsonify({'return': 'error', 'message': 'No Order found'})
+#         except Exception as e:
+#             return jsonify({'return': 'error', 'message': 'error getting order details : '+ str(e)})
+#     else:
+#         return jsonify({'return': 'error', 'message': 'method not allowed'})
 
 
 @app.route('/order/<order_id>', methods=['DELETE'])
