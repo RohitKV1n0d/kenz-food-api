@@ -336,7 +336,7 @@
        
         Example Input body:
         {   
-            'password': "admin123"
+            "new_password": "admin123"
         }
         Example Response body:
         {
@@ -363,11 +363,11 @@
     <p>Example : https://kenz-food-api.herokuapp.com/update_user</p>
     
        
-        Example Input Keys:
+        Example Input Keys(All are required): 
         ['firstname'] ('String')
         ['lastname'] ('String')
         ['email'] ('String')
-        ['mobile'] ('String')
+        ['phone'] ('String')
         ['user_image'] ('File')
         
        

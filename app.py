@@ -463,6 +463,8 @@ def sign_out():
     logout_user()
     return jsonify({'return': 'success'})
 
+
+
 @app.route('/update_password/<int:user_id>', methods=['PUT'])
 def update_password(user_id):
     if request.method == 'PUT':
