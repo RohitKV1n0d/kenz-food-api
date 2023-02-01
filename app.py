@@ -463,6 +463,8 @@ def sign_out():
     logout_user()
     return jsonify({'return': 'success'})
 
+
+
 @app.route('/update_password/<int:user_id>', methods=['PUT'])
 def update_password(user_id):
     if request.method == 'PUT':
@@ -532,8 +534,8 @@ def update_user(current_user):
                 user_image.save(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))   
                 upload_image = im.upload_image(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename), title=img_filename)
                 user.profile_url = upload_image.link
-            db.session.commit()
-            os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
+                db.session.commit()
+                os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
 
             return jsonify({'return': 'success'})
         else:
