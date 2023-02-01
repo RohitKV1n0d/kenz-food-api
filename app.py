@@ -2346,7 +2346,7 @@ def viewProductSubCategory(id,name):
 def editProductSubCategory(id,name):
     prod_subcat = ProductSubCategory.query.get_or_404(id)
     if request.method == 'POST':
-        print(prod_subcat)
+        # print(prod_subcat)
         try:
             # with app.app_context():
             img = request.files.get('subcategory_image_url')
@@ -2641,7 +2641,13 @@ def addProduct():
                             
 
 
-
+@app.route('/deleteImage/<id>', methods=['GET', 'POST'])
+@login_required
+def deleteImage(id):
+    prod_img = ProductImages.query.get_or_404(id)
+    db.session.delete(prod_img)
+    db.session.commit()
+    return redirect(url_for('editProduct', id=prod_img.fk_product_id))
 
 
 
@@ -2665,15 +2671,27 @@ def editProduct(id):
     prod_stock = ProductStock.query.filter_by(fk_product_id=id).all()
     if request.method == 'POST':
         try:
-            with app.app_context():
-                prod.product_name_en=request.form['product_name_en']
-                prod.product_name_ar=request.form['product_name_ar']
-                prod.product_desc_en=request.form['product_desc_en']
-                prod.product_desc_er=request.form['product_desc_ar']
-                prod.unit_id=request.form['unit']
-                prod.unit_quantity=request.form['unit_quantity']
-                db.session.commit()
-                prod_img = request.files.getlist('product_image_url')
+            # with app.app_context():
+            print('-------------------Debug Print-----------------')
+            print(request.form['product_name_en'])
+            print(request.form['product_name_ar'])
+            print(request.form['product_desc_en'])
+            print(request.form['product_desc_ar'])
+            print(request.form['unit'])
+            print(request.form['unit_quantity'])
+            
+            print('-------------------Debug Print-----------------')
+            prod.product_name_en=request.form['product_name_en']
+            prod.product_name_ar=request.form['product_name_ar']
+            prod.product_desc_en=request.form['product_desc_en']
+            prod.product_desc_er=request.form['product_desc_ar']
+            prod.unit_id=request.form['unit']
+            prod.unit_quantity=request.form['unit_quantity']
+            db.session.commit()
+            prod_img = request.files.getlist('product_image_url')
+            if not prod_img or not any(f for f in prod_img):
+                print('no image')
+            else:
                 for img in prod_img:
                     img_filename = secure_filename(img.filename)
                     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -2688,13 +2706,13 @@ def editProduct(id):
                     db.session.commit()
                     os.remove(os.path.join(basedir, app.config['UPLOAD_FOLDER'], img_filename))
 
-                prod_stock[0].product_price=request.form['product_price']
-                prod_stock[0].product_offer_price=request.form['product_offer_price']
-                prod_stock[0].product_purchase_price=request.form['product_purchase_price']
-                prod_stock[0].opening_stock=request.form['opening_stock']
-                prod_stock[0].min_stock=request.form['min_stock']
-                prod_stock[0].max_stock=request.form['max_stock']
-                db.session.commit()
+            prod_stock[0].product_price=request.form['product_price']
+            prod_stock[0].product_offer_price=request.form['product_offer_price']
+            prod_stock[0].product_purchase_price=request.form['product_purchase_price']
+            prod_stock[0].opening_stock=request.form['opening_stock']
+            prod_stock[0].min_stock=request.form['min_stock']
+            prod_stock[0].max_stock=request.form['max_stock']
+            db.session.commit()
             return redirect(url_for('viewSubcatOnlyProducts', id=subcat.id))
         except Exception as e:
             return jsonify({'return': 'error getting product :- '+str(e)})
