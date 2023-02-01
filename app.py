@@ -520,13 +520,13 @@ def verify(user_id):
 @token_required
 def update_user(current_user):
     if request.method == 'PUT':
-        content = request.json
+        # content = request.json
         user = Users.query.filter_by(id=current_user.id).first()
         if user:
-            user.firstname = content['firstname']
-            user.lastname = content['lastname']
-            user.email = content['email']
-            user.phone = content['phone']
+            user.firstname = request.form['firstname']
+            user.lastname = request.form['lastname']
+            user.email = request.form['email']
+            user.phone = request.form['phone']
             user_image = request.files.get('user_image')
             if user_image:
                 img_filename = secure_filename(user_image.filename)
