@@ -416,7 +416,7 @@
 <h3>Deactivate current User</h3>
 <ul>
     <p>Deactivate a user</p>
-    <p>URL: /deactivate</p>
+    <p>URL: /user_deactivate</p>
     <p>Method: PUT</p>
     <p>URL Content-Type: JSON</p>
     <p>Example : https://kenz-food-api.herokuapp.com/user_deactivate</p>
