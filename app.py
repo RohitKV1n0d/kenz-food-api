@@ -1677,10 +1677,10 @@ def incQty(jwt_current_user, product_id):
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
             product_stock = ProductStock.query.filter_by(fk_product_id=product_id).first()
-            if get_cart.quantityint(float(get_cart.quantity)) <= int(product_stock.min_stock):
+            if int(float(get_cart.quantity)) <= int(product_stock.min_stock):
                 return jsonify({'return': 'error', 'message': 'quantity must be less than min stock'})
             if get_cart:
-                get_cart.quantity = get_cart.quantityint(float(get_cart.quantity)) + 1
+                get_cart.quantity = int(float(get_cart.quantity)) + 1
                 get_cart.modified_at = datetime.datetime.now()
                 db.session.commit()
                 return jsonify({'return': 'success', 'message': 'quantity increased'})
@@ -1700,8 +1700,8 @@ def decQty(jwt_current_user, product_id):
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
             product_stock = ProductStock.query.filter_by(fk_product_id=product_id).first()
             if get_cart:
-                if get_cart.quantityint(float(get_cart.quantity)) > 1:
-                    get_cart.quantity = get_cart.quantityint(float(get_cart.quantity)) - 1
+                if int(float(get_cart.quantity)) > 1:
+                    get_cart.quantity = int(float(get_cart.quantity)) - 1
                     get_cart.modified_at = datetime.datetime.now()
                     db.session.commit()
                     return jsonify({'return': 'success', 'message': 'quantity decreased'})
