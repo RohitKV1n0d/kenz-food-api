@@ -1677,8 +1677,8 @@ def incQty(jwt_current_user, product_id):
         try:
             get_cart = CartItem.query.filter_by(fk_user_id=jwt_current_user.id, fk_product_id=product_id).first()
             product_stock = ProductStock.query.filter_by(fk_product_id=product_id).first()
-            if int(float(get_cart.quantity)) <= int(float(product_stock.min_stock)):
-                return jsonify({'return': 'error', 'message': 'quantity must be less than min stock'})
+            # if int(float(get_cart.quantity)) >= int(float(product_stock.min_stock)):
+            #     return jsonify({'return': 'error', 'message': 'quantity must be less than min stock'})
             if get_cart:
                 get_cart.quantity = int(float(get_cart.quantity)) + 1
                 get_cart.modified_at = datetime.datetime.now()
