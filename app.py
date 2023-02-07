@@ -48,7 +48,7 @@ CLIENT_ID = "2d3158d36137249"
 im = pyimgur.Imgur(CLIENT_ID)
 
 
-ENV = 'prod'
+ENV = 'dev'
 
 if ENV == 'dev' :
     app.debug = True
@@ -377,6 +377,13 @@ def load_user(user_id):
     return Users.query.get(int(user_id))
 
 @app.route('/', methods=['GET', 'POST'])
+def home():
+    return render_template('home.html')
+
+
+
+
+
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
