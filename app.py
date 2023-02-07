@@ -1530,7 +1530,7 @@ def addToCart(jwt_current_user, product_id):
         try:
            
             if checkcartitem:
-                checkcartitem.quantity = int(checkcartitem.quantity) + int(content['quantity'])
+                checkcartitem.quantity = int(float(checkcartitem.quantity)) + int(content['quantity'])
                 db.session.commit()
                 return jsonify({'return': 'success', 'message': 'product quantity updated'})
         
